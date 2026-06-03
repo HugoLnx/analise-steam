@@ -57,7 +57,7 @@ Coloque o arquivo JSON na raiz do projeto (mesma pasta do `manage.py`).
 
 Exemplo:
 
-```
+```ini
 steam_analytics/
  ├── import_json.py
  ├── manage.py
@@ -72,7 +72,7 @@ python import_json.py games.json
 
 Se tudo estiver correto, será exibido:
 
-```
+```sh
 Importação finalizada!
 ```
 
@@ -121,11 +121,37 @@ python manage.py test games.tests.test_list_games --verbosity=2
 
 Abrir no navegador:
 
-```
+```sh
 http://127.0.0.1:8000/admin
 ```
 
 Fazer login com o usuário criado.
+
+---
+
+### 10. Configurar o front
+
+Acesse o diretório e instale as dependências:
+
+```sh
+.\venv\Scripts\pip.exe install django-cors-headers
+
+cd frontend
+npm i
+```
+
+---
+
+### 11. Rodar o front
+
+Acesse o diretório e inicie o front:
+
+```sh
+cd frontend
+npm run dev
+
+Frontend React rodando em http://localhost:5173
+```
 
 ---
 
@@ -163,7 +189,6 @@ Os dados são organizados em três entidades principais:
 4. O Django Admin permite visualizar e filtrar os dados
 
 ---
-
 
 ## 📌 Conclusão
 

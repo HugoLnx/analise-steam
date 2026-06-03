@@ -1,0 +1,68 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #1b2838;
+    color: white;
+    margin: 0;
+    padding: 30px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input,
+select,
+button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+}
+
+button {
+    cursor: pointer;
+    background: #66c0f4;
+    color: black;
+    font-weight: bold;
+}
+
+#loading {
+    margin-top: 20px;
+}
+
+#errorMessage {
+    margin-top: 20px;
+    color: #ff8080;
+    font-weight: bold;
+}
+
+#gamesList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.game {
+    background: #2a475e;
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.game h2 {
+    margin-top: 0;
+    color: #66c0f4;
+}
+
+.pagination {
+    margin-top: 30px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
