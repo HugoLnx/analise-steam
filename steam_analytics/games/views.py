@@ -9,33 +9,15 @@ def home(request):
     return render(request, "games/index.html")
 
 
-def build_query(tags, operator="AND"):
+def build_or_query(tags):
 
     query = Q()
 
-    if operator == "AND":
+    for tag in tags:
 
-        first = True
-
-        for tag in tags:
-
-            condition = Q(
-                tags__name__icontains=tag
-            )
-
-            if first:
-                query = condition
-                first = False
-            else:
-                query &= condition
-
-    elif operator == "OR":
-
-        for tag in tags:
-
-            query |= Q(
-                tags__name__icontains=tag
-            )
+        query |= Q(
+            tags__name__iexact=tag
+        )
 
     return query
 
@@ -49,12 +31,12 @@ def list_games(request):
         ""
     ).strip()
 
-    include_groups = []
+    include_or_groups = []
 
     exclude_groups = []
 
     # ==========================================
-    # PARSER DOS FILTROS
+    # PARSER
     # ==========================================
 
     if filter_tags:
@@ -74,11 +56,9 @@ def list_games(request):
 
             command = parts[0].strip().upper()
 
-            tags_raw = parts[1]
-
             tags = [
                 tag.strip()
-                for tag in tags_raw.split(",")
+                for tag in parts[1].split(",")
                 if tag.strip()
             ]
 
@@ -88,9 +68,11 @@ def list_games(request):
 
             if command == "INCLUDE_AND":
 
-                include_groups.append(
-                    build_query(tags, "AND")
-                )
+                for tag in tags:
+
+                    games = games.filter(
+                        tags__name__iexact=tag
+                    )
 
             # ======================================
             # INCLUDE_OR
@@ -98,8 +80,8 @@ def list_games(request):
 
             elif command == "INCLUDE_OR":
 
-                include_groups.append(
-                    build_query(tags, "OR")
+                include_or_groups.append(
+                    build_or_query(tags)
                 )
 
             # ======================================
@@ -108,8 +90,24 @@ def list_games(request):
 
             elif command == "EXCLUDE_AND":
 
+                exclude_query = Q()
+
+                first = True
+
+                for tag in tags:
+
+                    condition = Q(
+                        tags__name__iexact=tag
+                    )
+
+                    if first:
+                        exclude_query = condition
+                        first = False
+                    else:
+                        exclude_query &= condition
+
                 exclude_groups.append(
-                    build_query(tags, "AND")
+                    exclude_query
                 )
 
             # ======================================
@@ -119,20 +117,20 @@ def list_games(request):
             elif command == "EXCLUDE_OR":
 
                 exclude_groups.append(
-                    build_query(tags, "OR")
+                    build_or_query(tags)
                 )
 
     # ==========================================
-    # APLICA INCLUDES
+    # INCLUDE_OR
     # ==========================================
 
-    if include_groups:
+    if include_or_groups:
 
         include_query = Q()
 
         first = True
 
-        for q in include_groups:
+        for q in include_or_groups:
 
             if first:
                 include_query = q
@@ -140,10 +138,12 @@ def list_games(request):
             else:
                 include_query |= q
 
-        games = games.filter(include_query)
+        games = games.filter(
+            include_query
+        )
 
     # ==========================================
-    # APLICA EXCLUDES
+    # EXCLUDES
     # ==========================================
 
     for q in exclude_groups:
@@ -190,13 +190,10 @@ def list_games(request):
     # ==========================================
 
     try:
-
         page = int(
             request.GET.get("page", 1)
         )
-
     except:
-
         page = 1
 
     per_page = 20
@@ -204,7 +201,6 @@ def list_games(request):
     total = games.count()
 
     start = (page - 1) * per_page
-
     end = start + per_page
 
     games = games[start:end]
@@ -227,32 +223,22 @@ def list_games(request):
         data.append({
 
             "appid": game.appid,
-
             "name": game.name,
-
             "price": game.price,
-
             "release_date": game.release_date,
-
             "review_count": game.review_count,
-
-            "revenue_1year":
-                game.revenue_1year,
-
+            "revenue_1year": game.revenue_1year,
             "tags": tags,
+
         })
 
     return JsonResponse({
 
         "results": data,
-
         "page": page,
-
         "per_page": per_page,
-
         "total": total,
-
         "total_pages":
-            (total + per_page - 1)
-            // per_page,
+            (total + per_page - 1) // per_page,
+
     })
