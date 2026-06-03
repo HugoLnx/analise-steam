@@ -1,0 +1,108 @@
+[
+  {
+    "model": "games.game",
+    "pk": 1,
+    "fields": {
+      "name": "Game Alpha",
+      "price": 29.99,
+      "release_date": "2022-01-15",
+      "review_count": 1500,
+      "revenue_1year": 45000.0
+    }
+  },
+  {
+    "model": "games.game",
+    "pk": 2,
+    "fields": {
+      "name": "Game Beta",
+      "price": 9.99,
+      "release_date": "2023-06-01",
+      "review_count": 300,
+      "revenue_1year": 3000.0
+    }
+  },
+  {
+    "model": "games.game",
+    "pk": 3,
+    "fields": {
+      "name": "Game Horror",
+      "price": 14.99,
+      "release_date": "2021-10-31",
+      "review_count": 800,
+      "revenue_1year": 1000.0
+    }
+  },
+  {
+    "model": "games.game",
+    "pk": 4,
+    "fields": {
+      "name": "Game Psychological Horror",
+      "price": 19.99,
+      "release_date": "2020-05-20",
+      "review_count": 400,
+      "revenue_1year": 900.0
+    }
+  },
+  {
+    "model": "games.game",
+    "pk": 5,
+    "fields": {
+      "name": "Game Survival Horror",
+      "price": 24.99,
+      "release_date": "2019-03-15",
+      "review_count": 600,
+      "revenue_1year": 800.0
+    }
+  },
+  {
+    "model": "games.game",
+    "pk": 6,
+    "fields": {
+      "name": "Game Action Indie",
+      "price": 4.99,
+      "release_date": "2024-01-01",
+      "review_count": 150,
+      "revenue_1year": 700.0
+    }
+  },
+  {
+    "model": "games.tag",
+    "pk": 1,
+    "fields": { "game": 1, "name": "Action" }
+  },
+  {
+    "model": "games.tag",
+    "pk": 2,
+    "fields": { "game": 1, "name": "RPG" }
+  },
+  {
+    "model": "games.tag",
+    "pk": 3,
+    "fields": { "game": 2, "name": "Indie" }
+  },
+  {
+    "model": "games.tag",
+    "pk": 4,
+    "fields": { "game": 3, "name": "Horror" }
+  },
+  {
+    "model": "games.tag",
+    "pk": 5,
+    "fields": { "game": 4, "name": "Psychological Horror" }
+  },
+  {
+    "model": "games.tag",
+    "pk": 6,
+    "fields": { "game": 5, "name": "Survival Horror" }
+  },
+  {
+    "model": "games.tag",
+    "pk": 7,
+    "fields": { "game": 6, "name": "Action" }
+  },
+  {
+    "model": "games.tag",
+    "pk": 8,
+    "fields": { "game": 6, "name": "Indie" }
+  }
+]

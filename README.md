@@ -100,7 +100,24 @@ python manage.py runserver
 
 ---
 
-### 8. Acessar o sistema
+### 8. Rodar os testes
+
+A suíte de testes usa SQLite em memória — não é necessário configuração extra.
+
+```bash
+cd steam_analytics
+python manage.py test games --verbosity=2
+```
+
+Para rodar apenas os testes da API de jogos:
+
+```bash
+python manage.py test games.tests.test_list_games --verbosity=2
+```
+
+---
+
+### 9. Acessar o sistema
 
 Abrir no navegador:
 
