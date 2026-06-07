@@ -34,7 +34,7 @@ const GameCard = ({ game }: { game: Game }) => {
             {(game.review_count_1year || 0).toFixed(1)} ({game.review_count || 0} {game.review_impression || "No Reviews"})
           </span>
           <span className="badge price">${game.price ?? 0}</span>
-          <span className="badge revenue">${((game.revenue_1year || 0) / 1000000).toFixed(1)}kk BRL</span>
+          <span className="badge revenue">${((game.revenue_1year || 0) / 1000000).toFixed(2)}M BRL</span>
           <span className="badge age">{diffYears} years</span>
         </div>
         <div className="header-image-container">
