@@ -43,21 +43,123 @@ button {
 }
 
 #gamesList {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     margin-top: 20px;
 }
 
-.game {
-    background: #2a475e;
-    padding: 15px;
-    border-radius: 12px;
+.game-card {
+    display: flex;
+    background: #1b2838;
+    border-radius: 4px;
+    overflow: hidden;
+    min-height: 250px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
-.game h2 {
-    margin-top: 0;
+.screenshots-grid {
+    width: 33%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+}
+
+.screenshots-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.game-info {
+    width: 67%;
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.game-name {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+.badges-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.badge.rating { background-color: #a34c4c; color: #ffcccc; }
+.badge.price { background-color: #4c9b4c; color: #ccffcc; }
+.badge.revenue { background-color: #8c4ca3; color: #f4ccff; }
+.badge.age { background-color: #4c5ba3; color: #ccccff; }
+
+.header-image-container {
+    width: 100%;
+    max-width: 120px;
+}
+
+.header-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 2px;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag {
+    background: #3d4450;
+    color: #acb2b8;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
+
+.actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.btn-steam, .btn-steamdb {
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: opacity 0.2s;
+}
+
+.btn-steam {
+    background-color: #171a21;
+    color: #ffffff;
+    border: 1px solid #66c0f4;
+}
+
+.btn-steamdb {
+    background-color: #1b2838;
     color: #66c0f4;
+    border: 1px solid #66c0f4;
+}
+
+.btn-steam:hover, .btn-steamdb:hover {
+    opacity: 0.8;
 }
 
 .pagination {

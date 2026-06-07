@@ -1,15 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
-
-interface Game {
-  appid: number;
-  name: string;
-  price: number;
-  release_date: string;
-  review_count: number;
-  revenue_1year: number;
-  tags: string[];
-}
+import GameCard, { type Game } from './components/GameCard';
 
 function App() {
   const [games, setGames] = useState<Game[]>([]);
@@ -137,14 +128,7 @@ function App() {
 
       <div id="gamesList">
         {games.map((game) => (
-          <div key={game.appid} className="game">
-            <h2>{game.name}</h2>
-            <p>💰 Preço: ${game.price ?? 0}</p>
-            <p>⭐ Reviews: {game.review_count ?? 0}</p>
-            <p>📈 Receita: ${Math.floor(game.revenue_1year ?? 0)}</p>
-            <p>📅 Lançamento: {game.release_date ?? "-"}</p>
-            <p>🏷️ Tags: {game.tags.join(", ")}</p>
-          </div>
+          <GameCard key={game.appid} game={game} />
         ))}
       </div>
 

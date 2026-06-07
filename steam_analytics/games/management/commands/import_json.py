@@ -45,7 +45,11 @@ def import_json(source):
                 "price": raw.get("price"),
                 "release_date": parse_date(raw.get("date")),
                 "review_count": raw.get("review_count"),
-                "revenue_1year": raw.get("revenue_1year")
+                "revenue_1year": raw.get("revenue_1year"),
+                "screenshot_urls": raw.get("screenshot_urls", []),
+                "capsule_url": raw.get("capsule_url"),
+                "review_count_1year": raw.get("review_count_1year"),
+                "review_impression": raw.get("review_impression"),
             }
         )
 

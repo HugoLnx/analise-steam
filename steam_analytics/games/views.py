@@ -229,6 +229,10 @@ def list_games(request):
             "review_count": game.review_count,
             "revenue_1year": game.revenue_1year,
             "tags": tags,
+            "screenshot_urls": game.screenshot_urls,
+            "capsule_url": game.capsule_url,
+            "review_count_1year": game.review_count_1year,
+            "review_impression": game.review_impression,
 
         })
 
