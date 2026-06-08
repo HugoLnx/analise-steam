@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import GameCard, { type Game } from './components/GameCard';
+import FilterSidebar from './components/FilterSidebar';
 
 function App() {
   const [games, setGames] = useState<Game[]>([]);
@@ -84,65 +85,55 @@ function App() {
   };
 
   return (
-    <div>
-      <h1>Steam Analytics</h1>
+    <div className="app-layout">
+      <main className="content-area">
+        <header className="results-bar">
+          <span className="results-count">
+            {loading ? 'Carregando...' : `Showing ${games.length} results`}
+          </span>
+          <div className="sort-container">
+            <label>Sort by:</label>
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <option value="revenue">Relevância (Receita)</option>
+              <option value="reviews">Reviews</option>
+              <option value="price">Preço</option>
+              <option value="release">Lançamento</option>
+            </select>
+          </div>
+        </header>
 
-      <div className="filters">
-        <input
-          type="text"
-          placeholder="INCLUDE_AND"
-          value={includeAnd}
-          onChange={(e) => setIncludeAnd(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="INCLUDE_OR"
-          value={includeOr}
-          onChange={(e) => setIncludeOr(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="EXCLUDE_AND"
-          value={excludeAnd}
-          onChange={(e) => setExcludeAnd(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="EXCLUDE_OR"
-          value={excludeOr}
-          onChange={(e) => setExcludeOr(e.target.value)}
-        />
+        {error && <div id="errorMessage">{error}</div>}
 
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-          <option value="revenue">Receita</option>
-          <option value="reviews">Reviews</option>
-          <option value="price">Preço</option>
-          <option value="release">Lançamento</option>
-        </select>
+        <div id="gamesList">
+          {games.map((game) => (
+            <GameCard key={game.appid} game={game} />
+          ))}
+        </div>
 
-        <button onClick={handleSearch}>Buscar</button>
-      </div>
+        <div className="pagination">
+          <button onClick={handlePrevPage} disabled={currentPage === 1}>
+            ⬅ Página Anterior
+          </button>
+          <span id="pageInfo">
+            Página {currentPage} de {totalPages}
+          </span>
+          <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+            Próxima Página ➡
+          </button>
+        </div>
+      </main>
 
-      {loading && <div id="loading">Carregando jogos...</div>}
-      {error && <div id="errorMessage">{error}</div>}
-
-      <div id="gamesList">
-        {games.map((game) => (
-          <GameCard key={game.appid} game={game} />
-        ))}
-      </div>
-
-      <div className="pagination">
-        <button onClick={handlePrevPage} disabled={currentPage === 1}>
-          ⬅ Página Anterior
-        </button>
-        <span id="pageInfo">
-          Página {currentPage} de {totalPages}
-        </span>
-        <button onClick={handleNextPage} disabled={currentPage === totalPages}>
-          Próxima Página ➡
-        </button>
-      </div>
+      <FilterSidebar 
+        includeAnd={includeAnd}
+        setIncludeAnd={setIncludeAnd}
+        includeOr={includeOr}
+        setIncludeOr={setIncludeOr}
+        excludeAnd={excludeAnd}
+        setExcludeAnd={setExcludeAnd}
+        excludeOr={excludeOr}
+        setExcludeOr={setExcludeOr}
+        onSearch={handleSearch}
+      />
     </div>
   );
 }
