@@ -13,6 +13,19 @@ function App() {
   const [includeOr, setIncludeOr] = useState('');
   const [excludeAnd, setExcludeAnd] = useState('');
   const [excludeOr, setExcludeOr] = useState('');
+  
+  // Novos Filtros
+  const [title, setTitle] = useState('');
+  const [onlyBr, setOnlyBr] = useState(false);
+  const [reviewsMin, setReviewsMin] = useState('');
+  const [reviewsMax, setReviewsMax] = useState('');
+  const [revenueMin, setRevenueMin] = useState('');
+  const [revenueMax, setRevenueMax] = useState('');
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
+  const [weeksMin, setWeeksMin] = useState('');
+  const [weeksMax, setWeeksMax] = useState('');
+
   const [sortBy, setSortBy] = useState('revenue');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -36,7 +49,17 @@ function App() {
         params: {
           page: page,
           sort: sortBy,
-          filter_tags: filterTags
+          filter_tags: filterTags,
+          title: title,
+          only_br: onlyBr,
+          reviews_min: reviewsMin,
+          reviews_max: reviewsMax,
+          revenue_min: revenueMin,
+          revenue_max: revenueMax,
+          price_min: priceMin,
+          price_max: priceMax,
+          weeks_min: weeksMin,
+          weeks_max: weeksMax,
         }
       });
 
@@ -53,7 +76,14 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [includeAnd, includeOr, excludeAnd, excludeOr, sortBy]);
+  }, [
+    includeAnd, includeOr, excludeAnd, excludeOr, 
+    sortBy, title, onlyBr, 
+    reviewsMin, reviewsMax, 
+    revenueMin, revenueMax, 
+    priceMin, priceMax, 
+    weeksMin, weeksMax
+  ]);
 
   // Handle page changes
   useEffect(() => {
@@ -133,6 +163,26 @@ function App() {
         excludeOr={excludeOr}
         setExcludeOr={setExcludeOr}
         onSearch={handleSearch}
+        title={title}
+        setTitle={setTitle}
+        onlyBr={onlyBr}
+        setOnlyBr={setOnlyBr}
+        reviewsMin={reviewsMin}
+        setReviewsMin={setReviewsMin}
+        reviewsMax={reviewsMax}
+        setReviewsMax={setReviewsMax}
+        revenueMin={revenueMin}
+        setRevenueMin={setRevenueMin}
+        revenueMax={revenueMax}
+        setRevenueMax={setRevenueMax}
+        priceMin={priceMin}
+        setPriceMin={setPriceMin}
+        priceMax={priceMax}
+        setPriceMax={setPriceMax}
+        weeksMin={weeksMin}
+        setWeeksMin={setWeeksMin}
+        weeksMax={weeksMax}
+        setWeeksMax={setWeeksMax}
       />
     </div>
   );

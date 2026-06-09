@@ -45,8 +45,28 @@ body {
   flex-direction: column;
   gap: 20px;
   height: fit-content;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
   position: sticky;
   top: 20px;
+}
+
+/* Custom scrollbar for sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--bg-input);
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
 }
 
 /* Sidebar Elements */
@@ -96,10 +116,66 @@ body {
   font-weight: bold;
   cursor: pointer;
   transition: opacity 0.2s;
+  flex: 1;
 }
 
 .btn-search:hover {
   opacity: 0.9;
+}
+
+.btn-reset {
+  background-color: #3d4450;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  flex: 1;
+}
+
+.sidebar-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1rem !important;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-primary) !important;
+  font-size: 0.9rem !important;
+}
+
+.range-group .range-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.range-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.range-field span {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.range-field input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border-color);
+  margin: 10px 0;
 }
 
 /* Top Results Bar */
