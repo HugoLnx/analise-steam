@@ -276,7 +276,7 @@ body {
 }
 
 .slider__range {
-  background-color: #f36f21; /* Orange color */
+  background-color: var(--bg-input); /* Orange color */
   z-index: 2;
 }
 
