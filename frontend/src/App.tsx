@@ -26,6 +26,16 @@ function App() {
   const [weeksMin, setWeeksMin] = useState('');
   const [weeksMax, setWeeksMax] = useState('');
 
+  // No Min/Max states
+  const [revNoMin, setRevNoMin] = useState(true);
+  const [revNoMax, setRevNoMax] = useState(true);
+  const [revenueNoMin, setRevenueNoMin] = useState(true);
+  const [revenueNoMax, setRevenueNoMax] = useState(true);
+  const [priceNoMin, setPriceNoMin] = useState(true);
+  const [priceNoMax, setPriceNoMax] = useState(true);
+  const [weeksNoMin, setWeeksNoMin] = useState(true);
+  const [weeksNoMax, setWeeksNoMax] = useState(true);
+
   const [sortBy, setSortBy] = useState('revenue');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -52,14 +62,14 @@ function App() {
           filter_tags: filterTags,
           title: title,
           only_br: onlyBr,
-          reviews_min: reviewsMin,
-          reviews_max: reviewsMax,
-          revenue_min: revenueMin,
-          revenue_max: revenueMax,
-          price_min: priceMin,
-          price_max: priceMax,
-          weeks_min: weeksMin,
-          weeks_max: weeksMax,
+          reviews_min: revNoMin ? '' : reviewsMin,
+          reviews_max: revNoMax ? '' : reviewsMax,
+          revenue_min: revenueNoMin ? '' : revenueMin,
+          revenue_max: revenueNoMax ? '' : revenueMax,
+          price_min: priceNoMin ? '' : priceMin,
+          price_max: priceNoMax ? '' : priceMax,
+          weeks_min: weeksNoMin ? '' : weeksMin,
+          weeks_max: weeksNoMax ? '' : weeksMax,
         }
       });
 
@@ -82,7 +92,11 @@ function App() {
     reviewsMin, reviewsMax, 
     revenueMin, revenueMax, 
     priceMin, priceMax, 
-    weeksMin, weeksMax
+    weeksMin, weeksMax,
+    revNoMin, revNoMax,
+    revenueNoMin, revenueNoMax,
+    priceNoMin, priceNoMax,
+    weeksNoMin, weeksNoMax
   ]);
 
   // Handle page changes
@@ -183,6 +197,22 @@ function App() {
         setWeeksMin={setWeeksMin}
         weeksMax={weeksMax}
         setWeeksMax={setWeeksMax}
+        revNoMin={revNoMin}
+        setRevNoMin={setRevNoMin}
+        revNoMax={revNoMax}
+        setRevNoMax={setRevNoMax}
+        revenueNoMin={revenueNoMin}
+        setRevenueNoMin={setRevenueNoMin}
+        revenueNoMax={revenueNoMax}
+        setRevenueNoMax={setRevenueNoMax}
+        priceNoMin={priceNoMin}
+        setPriceNoMin={setPriceNoMin}
+        priceNoMax={priceNoMax}
+        setPriceNoMax={setPriceNoMax}
+        weeksNoMin={weeksNoMin}
+        setWeeksNoMin={setWeeksNoMin}
+        weeksNoMax={weeksNoMax}
+        setWeeksNoMax={setWeeksNoMax}
       />
     </div>
   );
