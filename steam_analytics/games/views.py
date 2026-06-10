@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.db.models import Q
 
-from .models import Game
+from .models import Game, Tag
 
 
 def home(request):
@@ -292,3 +292,8 @@ def list_games(request):
             (total + per_page - 1) // per_page,
 
     })
+
+
+def list_tags(request):
+    tags = Tag.objects.values_list('name', flat=True).distinct().order_by('name')
+    return JsonResponse(list(tags), safe=False)

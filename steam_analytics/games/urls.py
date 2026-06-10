@@ -2,7 +2,8 @@ from django.urls import path
 
 from .views import (
     home,
-    list_games
+    list_games,
+    list_tags
 )
 
 urlpatterns = [
@@ -15,5 +16,10 @@ urlpatterns = [
     path(
         "api/games/",
         list_games
+    ),
+
+    path(
+        "api/tags/",
+        list_tags
     ),
 ]

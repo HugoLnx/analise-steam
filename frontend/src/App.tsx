@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import GameCard, { type Game } from './components/GameCard';
 import FilterSidebar from './components/FilterSidebar';
+import type { TagClause } from './components/TagClauseFilter';
 
 function App() {
   const [games, setGames] = useState<Game[]>([]);
@@ -36,11 +37,28 @@ function App() {
   const [weeksNoMin, setWeeksNoMin] = useState(true);
   const [weeksNoMax, setWeeksNoMax] = useState(true);
 
+  // Novos estados para TagClauseFilter
+  const [tagClauses, setTagClauses] = useState<TagClause[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+
   const [sortBy, setSortBy] = useState('revenue');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const isInitialMount = useRef(true);
+
+  // Fetch real tags
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/tags/');
+        setAvailableTags(response.data);
+      } catch (err) {
+        console.error('Error fetching tags:', err);
+      }
+    };
+    fetchTags();
+  }, []);
 
   const fetchGames = useCallback(async (page: number) => {
     setLoading(true);
@@ -48,10 +66,19 @@ function App() {
 
     try {
       const filters = [];
+      
+      // Old input filters
       if (includeAnd.trim()) filters.push(`INCLUDE_AND ${includeAnd.trim()}`);
       if (includeOr.trim()) filters.push(`INCLUDE_OR ${includeOr.trim()}`);
       if (excludeAnd.trim()) filters.push(`EXCLUDE_AND ${excludeAnd.trim()}`);
       if (excludeOr.trim()) filters.push(`EXCLUDE_OR ${excludeOr.trim()}`);
+
+      // New Tag Clauses filters
+      tagClauses.forEach(clause => {
+        if (clause.tags.length > 0) {
+          filters.push(`${clause.type} ${clause.tags.join(',')}`);
+        }
+      });
 
       const filterTags = filters.join(';');
 
@@ -96,7 +123,8 @@ function App() {
     revNoMin, revNoMax,
     revenueNoMin, revenueNoMax,
     priceNoMin, priceNoMax,
-    weeksNoMin, weeksNoMax
+    weeksNoMin, weeksNoMax,
+    tagClauses
   ]);
 
   // Handle page changes
@@ -213,6 +241,9 @@ function App() {
         setWeeksNoMin={setWeeksNoMin}
         weeksNoMax={weeksNoMax}
         setWeeksNoMax={setWeeksNoMax}
+        availableTags={availableTags}
+        tagClauses={tagClauses}
+        setTagClauses={setTagClauses}
       />
     </div>
   );

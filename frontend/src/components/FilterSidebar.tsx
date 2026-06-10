@@ -1,4 +1,7 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React from 'react';
+import { TagClauseFilter } from './TagClauseFilter';
+import type { TagClause } from './TagClauseFilter';
+import DualRange from './DualRange';
 
 interface FilterSidebarProps {
   includeAnd: string;
@@ -42,116 +45,19 @@ interface FilterSidebarProps {
   priceNoMax: boolean; setPriceNoMax: (v: boolean) => void;
   weeksNoMin: boolean; setWeeksNoMin: (v: boolean) => void;
   weeksNoMax: boolean; setWeeksNoMax: (v: boolean) => void;
+
+  // Props para TagClauseFilter
+  availableTags: string[];
+  tagClauses: TagClause[];
+  setTagClauses: (clauses: TagClause[]) => void;
 }
-
-const DualRange: React.FC<{
-  label: string;
-  min: number;
-  max: number;
-  minVal: string;
-  maxVal: string;
-  setMin: (v: string) => void;
-  setMax: (v: string) => void;
-  noMin: boolean;
-  setNoMin: (v: boolean) => void;
-  noMax: boolean;
-  setNoMax: (v: boolean) => void;
-  step?: number;
-  prefix?: string;
-}> = ({ label, min, max, minVal, maxVal, setMin, setMax, noMin, setNoMin, noMax, setNoMax, step = 1, prefix = "" }) => {
-  const [minThumb, setMinThumb] = useState(Number(minVal) || min);
-  const [maxThumb, setMaxThumb] = useState(Number(maxVal) || max);
-  const rangeRef = useRef<HTMLDivElement>(null);
-
-  const getPercent = useCallback(
-    (value: number) => Math.round(((value - min) / (max - min)) * 100),
-    [min, max]
-  );
-
-  useEffect(() => {
-    if (rangeRef.current) {
-      const minPercent = noMin ? 0 : getPercent(minThumb);
-      const maxPercent = noMax ? 100 : getPercent(maxThumb);
-
-      rangeRef.current.style.left = `${minPercent}%`;
-      rangeRef.current.style.width = `${maxPercent - minPercent}%`;
-    }
-  }, [minThumb, maxThumb, getPercent, noMin, noMax]);
-
-  return (
-    <div className="filter-group range-group">
-      <div className="range-header">
-        <label>{label}</label>
-        <div className="limit-toggles">
-          <label className="tiny-check">
-            <input type="checkbox" checked={noMin} onChange={(e) => setNoMin(e.target.checked)} />
-            no min
-          </label>
-          <label className="tiny-check">
-            <input type="checkbox" checked={noMax} onChange={(e) => setNoMax(e.target.checked)} />
-            no max
-          </label>
-        </div>
-      </div>
-      
-      <div className="dual-range-visual">
-        <div className="multi-range-slider">
-          <input
-            type="range"
-            min={min}
-            max={max}
-            step={step}
-            value={noMin ? min : minThumb}
-            onChange={(event) => {
-              const value = Math.min(Number(event.target.value), maxThumb - step);
-              setMinThumb(value);
-              setMin(value.toString());
-              setNoMin(false);
-            }}
-            className={`thumb thumb--left ${noMin ? 'disabled' : ''}`}
-            style={{ zIndex: (minThumb > max - 100 || minThumb === maxThumb) ? "10" : "6" }}
-            disabled={noMin}
-          />
-          <div className="thumb-label thumb-label--left" style={{ left: `${noMin ? 0 : getPercent(minThumb)}%` }}>
-            {noMin ? '∞' : `${prefix}${minThumb}`}
-          </div>
-
-          <input
-            type="range"
-            min={min}
-            max={max}
-            step={step}
-            value={noMax ? max : maxThumb}
-            onChange={(event) => {
-              const value = Math.max(Number(event.target.value), minThumb + step);
-              setMaxThumb(value);
-              setMax(value.toString());
-              setNoMax(false);
-            }}
-            className={`thumb thumb--right ${noMax ? 'disabled' : ''}`}
-            style={{ zIndex: (minThumb > max - 100 || minThumb === maxThumb) ? "6" : "10" }}
-            disabled={noMax}
-          />
-          <div className="thumb-label thumb-label--right" style={{ left: `${noMax ? 100 : getPercent(maxThumb)}%` }}>
-            {noMax ? '∞' : `${prefix}${maxThumb}`}
-          </div>
-
-          <div className="slider">
-            <div className="slider__track" />
-            <div ref={rangeRef} className="slider__range" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
   const {
-    includeAnd, setIncludeAnd,
-    includeOr, setIncludeOr,
-    excludeAnd, setExcludeAnd,
-    excludeOr, setExcludeOr,
+    setIncludeAnd,
+    setIncludeOr,
+    setExcludeAnd,
+    setExcludeOr,
     onSearch,
     title, setTitle,
     onlyBr, setOnlyBr,
@@ -170,7 +76,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
     priceNoMin, setPriceNoMin,
     priceNoMax, setPriceNoMax,
     weeksNoMin, setWeeksNoMin,
-    weeksNoMax, setWeeksNoMax
+    weeksNoMax, setWeeksNoMax,
   } = props;
   
   const handleReset = () => {
@@ -212,6 +118,14 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
+      </div>
+
+      <div className='filter-group'>
+        <TagClauseFilter
+                  availableTags={props.availableTags}
+                  clauses={props.tagClauses}
+                  onChange={props.setTagClauses}
+                />
       </div>
 
       <div className="filter-group checkbox-group">
@@ -286,7 +200,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         setNoMax={setWeeksNoMax}
       />
 
-      <hr />
+      {/* Código anterior, com filtersTags separados <hr />
 
       <div className="filter-group">
         <label>Tags INCLUDE (AND)</label>
@@ -326,7 +240,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
           value={excludeOr}
           onChange={(e) => setExcludeOr(e.target.value)}
         />
-      </div>
+      </div> */}
 
       <div className="sidebar-buttons">
         <button className="btn-reset" onClick={handleReset}>
