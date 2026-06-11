@@ -1,4 +1,5 @@
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Check, X } from 'lucide-react';
+import { useState, useRef } from 'react';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 
 export type ClauseType = 'INCLUDE_AND' | 'INCLUDE_OR' | 'EXCLUDE_AND' | 'EXCLUDE_OR';
@@ -22,7 +23,17 @@ const clauseTypeLabels: Record<ClauseType, string> = {
   EXCLUDE_OR: 'Exclude OR'
 };
 
+const clauseTypeShortLabels: Record<ClauseType, string> = {
+  INCLUDE_AND: 'AND',
+  INCLUDE_OR: 'OR',
+  EXCLUDE_AND: 'NOT AND',
+  EXCLUDE_OR: 'NOT OR'
+};
+
 export function TagClauseFilter({ availableTags, clauses, onChange }: TagClauseFilterProps) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const addClause = () => {
     const newClause: TagClause = {
       id: Date.now().toString(),
@@ -30,10 +41,12 @@ export function TagClauseFilter({ availableTags, clauses, onChange }: TagClauseF
       tags: []
     };
     onChange([...clauses, newClause]);
+    setEditingId(newClause.id);
   };
 
   const removeClause = (id: string) => {
     onChange(clauses.filter(c => c.id !== id));
+    if (editingId === id) setEditingId(null);
   };
 
   const updateClauseType = (id: string, type: ClauseType) => {
@@ -45,7 +58,7 @@ export function TagClauseFilter({ availableTags, clauses, onChange }: TagClauseF
   };
 
   return (
-    <div className="filter-group tag-clause-container">
+    <div className="filter-group tag-clause-container" ref={containerRef}>
       <div className="clause-header">
         <label className="filter-label">Tag Clauses</label>
         <button
@@ -53,31 +66,22 @@ export function TagClauseFilter({ availableTags, clauses, onChange }: TagClauseF
           className="btn-add-clause"
         >
           <Plus size={14} />
-          Add Clause
+          Add
         </button>
       </div>
 
-      {clauses.length === 0 && (
-        <div className="empty-clauses">
-          No clauses added. Click + to add one.
-        </div>
-      )}
+      <div className="clauses-chips-container">
+        {clauses.map((clause) => {
+          const isEditing = editingId === clause.id;
 
-      <div className="clauses-list">
-        {clauses.map((clause) => (
-          <div
-            key={clause.id}
-            className="clause-card"
-          >
-            <div className="clause-card-content">
-              <div className="clause-fields">
-                {/* Clause Type Dropdown */}
-                <div className="filter-group">
-                  <label className="tiny-label">Clause Type</label>
+          if (isEditing) {
+            return (
+              <div key={clause.id} className="clause-edit-bubble">
+                <div className="clause-edit-row">
                   <select
                     value={clause.type}
                     onChange={(e) => updateClauseType(clause.id, e.target.value as ClauseType)}
-                    className="clause-select"
+                    className="clause-type-select-compact"
                   >
                     {Object.entries(clauseTypeLabels).map(([value, label]) => (
                       <option key={value} value={value}>
@@ -85,29 +89,65 @@ export function TagClauseFilter({ availableTags, clauses, onChange }: TagClauseF
                       </option>
                     ))}
                   </select>
+                  
+                  <MultiSelectDropdown
+                    label="Tags"
+                    options={availableTags}
+                    selectedValues={clause.tags}
+                    onChange={(tags) => updateClauseTags(clause.id, tags)}
+                    placeholder="Tags..."
+                    hideLabel
+                  />
+
+                  <div className="clause-edit-actions">
+                    <button 
+                      onClick={() => setEditingId(null)}
+                      className="btn-done-clause"
+                      title="Done"
+                    >
+                      <Check size={14} />
+                    </button>
+                    <button
+                      onClick={() => removeClause(clause.id)}
+                      className="btn-remove-clause-compact"
+                      title="Remove"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
-
-                {/* Tags Multiselect */}
-                <MultiSelectDropdown
-                  label="Tags"
-                  options={availableTags}
-                  selectedValues={clause.tags}
-                  onChange={(tags) => updateClauseTags(clause.id, tags)}
-                  placeholder="Select tags..."
-                />
               </div>
+            );
+          }
 
-              {/* Remove Button */}
-              <button
-                onClick={() => removeClause(clause.id)}
-                className="btn-remove-clause"
-                title="Remove clause"
+          return (
+            <div 
+              key={clause.id} 
+              className={`clause-summary-chip ${clause.type.startsWith('EXCLUDE') ? 'exclude' : ''}`}
+              onClick={() => setEditingId(clause.id)}
+            >
+              <span className="clause-type-badge">{clauseTypeShortLabels[clause.type]}</span>
+              <span className="clause-tags-preview">
+                {clause.tags.length > 0 ? clause.tags.join(', ') : 'Empty'}
+              </span>
+              <button 
+                className="clause-chip-remove"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeClause(clause.id);
+                }}
               >
-                <Trash2 size={16} />
+                <X size={12} />
               </button>
             </div>
+          );
+        })}
+
+        {clauses.length === 0 && (
+          <div className="empty-clauses-mini">
+            No clauses.
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

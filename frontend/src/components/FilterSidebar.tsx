@@ -77,6 +77,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
     priceNoMax, setPriceNoMax,
     weeksNoMin, setWeeksNoMin,
     weeksNoMax, setWeeksNoMax,
+    setTagClauses,
   } = props;
   
   const handleReset = () => {
@@ -102,6 +103,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
     setPriceNoMax(true);
     setWeeksNoMin(true);
     setWeeksNoMax(true);
+    setTagClauses([]);
   };
 
   return (
@@ -128,6 +130,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
                 />
       </div>
 
+      <hr />
+
       <div className="filter-group checkbox-group">
         <label>
           <input
@@ -144,7 +148,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
       <DualRange
         label="Reviews 1 Year"
         min={0}
-        max={10000}
+        max={1000000}
         minVal={reviewsMin}
         maxVal={reviewsMax}
         setMin={setReviewsMin}
@@ -158,7 +162,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
       <DualRange
         label="Revenue 1 Year"
         min={0}
-        max={10000}
+        max={1000000000}
         minVal={revenueMin}
         maxVal={revenueMax}
         setMin={setRevenueMin}
@@ -173,7 +177,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
       <DualRange
         label="Price"
         min={0}
-        max={200}
+        max={500}
         step={0.01}
         minVal={priceMin}
         maxVal={priceMax}

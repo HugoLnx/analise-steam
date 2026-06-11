@@ -7,6 +7,7 @@ interface MultiSelectDropdownProps {
   selectedValues: string[];
   onChange: (values: string[]) => void;
   placeholder?: string;
+  hideLabel?: boolean;
 }
 
 export function MultiSelectDropdown({
@@ -14,7 +15,8 @@ export function MultiSelectDropdown({
   options,
   selectedValues,
   onChange,
-  placeholder = "Select..."
+  placeholder = "Select...",
+  hideLabel = false
 }: MultiSelectDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -44,10 +46,12 @@ export function MultiSelectDropdown({
   };
 
   return (
-    <div className="filter-group dropdown-container" ref={dropdownRef}>
-      <label className="filter-label">
-        {label}
-      </label>
+    <div className={`filter-group dropdown-container ${hideLabel ? 'no-label' : ''}`} ref={dropdownRef}>
+      {!hideLabel && (
+        <label className="filter-label">
+          {label}
+        </label>
+      )}
 
       <div className="relative-container">
         <button

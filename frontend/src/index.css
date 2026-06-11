@@ -231,7 +231,7 @@ body {
   opacity: 1;
 }
 
-/* TagClauseFilter Styles */
+/* TagClauseFilter Styles (Chip-based) */
 .tag-clause-container {
   border-top: 1px solid var(--border-color);
   padding-top: 15px;
@@ -241,91 +241,160 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .btn-add-clause {
-  background: var(--accent-blue);
-  color: #171a21;
-  border: none;
-  padding: 4px 10px;
-  border-radius: 3px;
-  font-size: 0.75rem;
+  background: var(--bg-input);
+  color: var(--accent-blue);
+  border: 1px solid var(--accent-blue);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
   font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 4px;
+  transition: all 0.2s;
 }
 
-.empty-clauses {
-  text-align: center;
-  padding: 20px;
-  border: 1px dashed var(--border-color);
-  border-radius: 4px;
-  color: var(--text-secondary);
-  font-size: 0.8rem;
+.btn-add-clause:hover {
+  background: var(--accent-blue);
+  color: #171a21;
 }
 
-.clauses-list {
+.clauses-chips-container {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 24px;
 }
 
-.clause-card {
-  background: rgba(0, 0, 0, 0.2);
+.clause-summary-chip {
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 12px;
-}
-
-.clause-card-content {
+  border-radius: 16px;
+  padding: 2px 10px;
   display: flex;
-  gap: 12px;
-}
-
-.clause-fields {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.clause-select {
-  background: var(--bg-input);
-  border: 1px solid #171a21;
-  color: white;
-  padding: 6px 10px;
-  border-radius: 3px;
-  font-size: 0.85rem;
+  align-items: center;
+  gap: 8px;
   cursor: pointer;
+  font-size: 0.75rem;
+  transition: border-color 0.2s, background 0.2s;
+  max-width: 100%;
 }
 
-.btn-remove-clause {
-  background: transparent;
-  border: none;
-  color: var(--accent-red);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 3px;
-  display: flex;
-  align-items: flex-start;
-  opacity: 0.7;
-  transition: opacity 0.2s, background 0.2s;
+.clause-summary-chip:hover {
+  border-color: var(--accent-blue);
+  background: rgba(102, 192, 244, 0.1);
 }
 
-.btn-remove-clause:hover {
-  opacity: 1;
+.clause-summary-chip.exclude {
+  border-color: rgba(163, 76, 76, 0.4);
+}
+
+.clause-summary-chip.exclude:hover {
+  border-color: var(--accent-red);
   background: rgba(163, 76, 76, 0.1);
 }
 
-.tiny-label {
-  font-size: 0.65rem !important;
-  color: var(--text-secondary);
+.clause-type-badge {
+  font-weight: bold;
+  color: var(--accent-blue);
   text-transform: uppercase;
-  margin-bottom: 4px;
-  display: block;
+  font-size: 0.65rem;
+  padding-right: 6px;
+  border-right: 1px solid var(--border-color);
+}
+
+.exclude .clause-type-badge {
+  color: var(--accent-red);
+}
+
+.clause-tags-preview {
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.clause-chip-remove {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.clause-chip-remove:hover {
+  color: var(--accent-red);
+  background: rgba(0,0,0,0.2);
+}
+
+.clause-edit-bubble {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--accent-blue);
+  border-radius: 8px;
+  padding: 8px;
+  margin: 4px 0;
+}
+
+.clause-edit-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.clause-type-select-compact {
+  background: #171a21;
+  border: 1px solid var(--border-color);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  width: 100%;
+}
+
+.clause-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.btn-done-clause {
+  background: var(--accent-green);
+  color: #171a21;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.btn-remove-clause-compact {
+  background: var(--accent-red);
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.empty-clauses-mini {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 4px;
 }
 
 /* Custom Scrollbar for Dropdown Menu */
