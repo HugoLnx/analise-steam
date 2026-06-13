@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.db.models import Q
 
-from .models import Game
+from .models import Game, Tag
 
 
 def home(request):
@@ -25,6 +25,52 @@ def build_or_query(tags):
 def list_games(request):
 
     games = Game.objects.all()
+
+    # ==========================================
+    # NOVOS FILTROS
+    # ==========================================
+    title = request.GET.get("title", "").strip()
+    if title:
+        games = games.filter(name__icontains=title)
+
+    only_br = request.GET.get("only_br", "false").lower() == "true"
+    if only_br:
+        games = games.filter(tags__name__iexact="brazilian")
+
+    # Reviews 1 Year
+    rev_min = request.GET.get("reviews_min")
+    if rev_min:
+        games = games.filter(review_count_1year__gte=float(rev_min))
+    rev_max = request.GET.get("reviews_max")
+    if rev_max:
+        games = games.filter(review_count_1year__lte=float(rev_max))
+
+    # Revenue 1 Year
+    revenue_min = request.GET.get("revenue_min")
+    if revenue_min:
+        games = games.filter(revenue_1year__gte=float(revenue_min))
+    revenue_max = request.GET.get("revenue_max")
+    if revenue_max:
+        games = games.filter(revenue_1year__lte=float(revenue_max))
+
+    # Price
+    price_min = request.GET.get("price_min")
+    if price_min:
+        games = games.filter(price__gte=float(price_min))
+    price_max = request.GET.get("price_max")
+    if price_max:
+        games = games.filter(price__lte=float(price_max))
+
+    # Weeks Ago
+    from datetime import datetime, timedelta
+    weeks_min = request.GET.get("weeks_min")
+    if weeks_min:
+        date_limit = datetime.now() - timedelta(weeks=float(weeks_min))
+        games = games.filter(release_date__lte=date_limit.date())
+    weeks_max = request.GET.get("weeks_max")
+    if weeks_max:
+        date_limit = datetime.now() - timedelta(weeks=float(weeks_max))
+        games = games.filter(release_date__gte=date_limit.date())
 
     filter_tags = request.GET.get(
         "filter_tags",
@@ -276,3 +322,8 @@ def list_games(request):
             (total + per_page - 1) // per_page,
 
     })
+
+
+def list_tags(request):
+    tags = Tag.objects.values_list('name', flat=True).distinct().order_by('name')
+    return JsonResponse(list(tags), safe=False)

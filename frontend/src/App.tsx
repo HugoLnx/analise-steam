@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import GameCard, { type Game } from './components/GameCard';
 import FilterSidebar from './components/FilterSidebar';
+import type { TagClause } from './components/TagClauseFilter';
 
 function App() {
   const [games, setGames] = useState<Game[]>([]);
@@ -13,11 +14,51 @@ function App() {
   const [includeOr, setIncludeOr] = useState('');
   const [excludeAnd, setExcludeAnd] = useState('');
   const [excludeOr, setExcludeOr] = useState('');
+  
+  // Novos Filtros
+  const [title, setTitle] = useState('');
+  const [onlyBr, setOnlyBr] = useState(false);
+  const [reviewsMin, setReviewsMin] = useState('');
+  const [reviewsMax, setReviewsMax] = useState('');
+  const [revenueMin, setRevenueMin] = useState('');
+  const [revenueMax, setRevenueMax] = useState('');
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
+  const [weeksMin, setWeeksMin] = useState('');
+  const [weeksMax, setWeeksMax] = useState('');
+
+  // No Min/Max states
+  const [revNoMin, setRevNoMin] = useState(true);
+  const [revNoMax, setRevNoMax] = useState(true);
+  const [revenueNoMin, setRevenueNoMin] = useState(true);
+  const [revenueNoMax, setRevenueNoMax] = useState(true);
+  const [priceNoMin, setPriceNoMin] = useState(true);
+  const [priceNoMax, setPriceNoMax] = useState(true);
+  const [weeksNoMin, setWeeksNoMin] = useState(true);
+  const [weeksNoMax, setWeeksNoMax] = useState(true);
+
+  // Novos estados para TagClauseFilter
+  const [tagClauses, setTagClauses] = useState<TagClause[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+
   const [sortBy, setSortBy] = useState('revenue');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const isInitialMount = useRef(true);
+
+  // Fetch real tags
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/tags/');
+        setAvailableTags(response.data);
+      } catch (err) {
+        console.error('Error fetching tags:', err);
+      }
+    };
+    fetchTags();
+  }, []);
 
   const fetchGames = useCallback(async (page: number) => {
     setLoading(true);
@@ -25,10 +66,19 @@ function App() {
 
     try {
       const filters = [];
+      
+      // Old input filters
       if (includeAnd.trim()) filters.push(`INCLUDE_AND ${includeAnd.trim()}`);
       if (includeOr.trim()) filters.push(`INCLUDE_OR ${includeOr.trim()}`);
       if (excludeAnd.trim()) filters.push(`EXCLUDE_AND ${excludeAnd.trim()}`);
       if (excludeOr.trim()) filters.push(`EXCLUDE_OR ${excludeOr.trim()}`);
+
+      // New Tag Clauses filters
+      tagClauses.forEach(clause => {
+        if (clause.tags.length > 0) {
+          filters.push(`${clause.type} ${clause.tags.join(',')}`);
+        }
+      });
 
       const filterTags = filters.join(';');
 
@@ -36,7 +86,17 @@ function App() {
         params: {
           page: page,
           sort: sortBy,
-          filter_tags: filterTags
+          filter_tags: filterTags,
+          title: title,
+          only_br: onlyBr,
+          reviews_min: revNoMin ? '' : reviewsMin,
+          reviews_max: revNoMax ? '' : reviewsMax,
+          revenue_min: revenueNoMin ? '' : revenueMin,
+          revenue_max: revenueNoMax ? '' : revenueMax,
+          price_min: priceNoMin ? '' : priceMin,
+          price_max: priceNoMax ? '' : priceMax,
+          weeks_min: weeksNoMin ? '' : weeksMin,
+          weeks_max: weeksNoMax ? '' : weeksMax,
         }
       });
 
@@ -53,7 +113,19 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [includeAnd, includeOr, excludeAnd, excludeOr, sortBy]);
+  }, [
+    includeAnd, includeOr, excludeAnd, excludeOr, 
+    sortBy, title, onlyBr, 
+    reviewsMin, reviewsMax, 
+    revenueMin, revenueMax, 
+    priceMin, priceMax, 
+    weeksMin, weeksMax,
+    revNoMin, revNoMax,
+    revenueNoMin, revenueNoMax,
+    priceNoMin, priceNoMax,
+    weeksNoMin, weeksNoMax,
+    tagClauses
+  ]);
 
   // Handle page changes
   useEffect(() => {
@@ -133,6 +205,45 @@ function App() {
         excludeOr={excludeOr}
         setExcludeOr={setExcludeOr}
         onSearch={handleSearch}
+        title={title}
+        setTitle={setTitle}
+        onlyBr={onlyBr}
+        setOnlyBr={setOnlyBr}
+        reviewsMin={reviewsMin}
+        setReviewsMin={setReviewsMin}
+        reviewsMax={reviewsMax}
+        setReviewsMax={setReviewsMax}
+        revenueMin={revenueMin}
+        setRevenueMin={setRevenueMin}
+        revenueMax={revenueMax}
+        setRevenueMax={setRevenueMax}
+        priceMin={priceMin}
+        setPriceMin={setPriceMin}
+        priceMax={priceMax}
+        setPriceMax={setPriceMax}
+        weeksMin={weeksMin}
+        setWeeksMin={setWeeksMin}
+        weeksMax={weeksMax}
+        setWeeksMax={setWeeksMax}
+        revNoMin={revNoMin}
+        setRevNoMin={setRevNoMin}
+        revNoMax={revNoMax}
+        setRevNoMax={setRevNoMax}
+        revenueNoMin={revenueNoMin}
+        setRevenueNoMin={setRevenueNoMin}
+        revenueNoMax={revenueNoMax}
+        setRevenueNoMax={setRevenueNoMax}
+        priceNoMin={priceNoMin}
+        setPriceNoMin={setPriceNoMin}
+        priceNoMax={priceNoMax}
+        setPriceNoMax={setPriceNoMax}
+        weeksNoMin={weeksNoMin}
+        setWeeksNoMin={setWeeksNoMin}
+        weeksNoMax={weeksNoMax}
+        setWeeksNoMax={setWeeksNoMax}
+        availableTags={availableTags}
+        tagClauses={tagClauses}
+        setTagClauses={setTagClauses}
       />
     </div>
   );
