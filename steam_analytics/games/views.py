@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.db.models import Q
 
-from .models import Game
+from .models import Game, Tag
 
 
 def home(request):
@@ -26,13 +26,58 @@ def list_games(request):
 
     games = Game.objects.all()
 
+    # ==========================================
+    # NOVOS FILTROS
+    # ==========================================
+    title = request.GET.get("title", "").strip()
+    if title:
+        games = games.filter(name__icontains=title)
+
+    only_br = request.GET.get("only_br", "false").lower() == "true"
+    if only_br:
+        games = games.filter(tags__name__iexact="brazilian")
+
+    # Reviews 1 Year
+    rev_min = request.GET.get("reviews_min")
+    if rev_min:
+        games = games.filter(review_count_1year__gte=float(rev_min))
+    rev_max = request.GET.get("reviews_max")
+    if rev_max:
+        games = games.filter(review_count_1year__lte=float(rev_max))
+
+    # Revenue 1 Year
+    revenue_min = request.GET.get("revenue_min")
+    if revenue_min:
+        games = games.filter(revenue_1year__gte=float(revenue_min))
+    revenue_max = request.GET.get("revenue_max")
+    if revenue_max:
+        games = games.filter(revenue_1year__lte=float(revenue_max))
+
+    # Price
+    price_min = request.GET.get("price_min")
+    if price_min:
+        games = games.filter(price__gte=float(price_min))
+    price_max = request.GET.get("price_max")
+    if price_max:
+        games = games.filter(price__lte=float(price_max))
+
+    # Weeks Ago
+    from datetime import datetime, timedelta
+    weeks_min = request.GET.get("weeks_min")
+    if weeks_min:
+        date_limit = datetime.now() - timedelta(weeks=float(weeks_min))
+        games = games.filter(release_date__lte=date_limit.date())
+    weeks_max = request.GET.get("weeks_max")
+    if weeks_max:
+        date_limit = datetime.now() - timedelta(weeks=float(weeks_max))
+        games = games.filter(release_date__gte=date_limit.date())
+
     filter_tags = request.GET.get(
         "filter_tags",
         ""
     ).strip()
 
-    include_or_groups = []
-
+    include_groups = []
     exclude_groups = []
 
     # ==========================================
@@ -68,11 +113,22 @@ def list_games(request):
 
             if command == "INCLUDE_AND":
 
+                group_games = Game.objects.all()
+
                 for tag in tags:
 
-                    games = games.filter(
+                    group_games = group_games.filter(
                         tags__name__iexact=tag
                     )
+
+                include_groups.append(
+                    set(
+                        group_games.values_list(
+                            "appid",
+                            flat=True
+                        )
+                    )
+                )
 
             # ======================================
             # INCLUDE_OR
@@ -80,8 +136,17 @@ def list_games(request):
 
             elif command == "INCLUDE_OR":
 
-                include_or_groups.append(
+                group_games = Game.objects.filter(
                     build_or_query(tags)
+                )
+
+                include_groups.append(
+                    set(
+                        group_games.values_list(
+                            "appid",
+                            flat=True
+                        )
+                    )
                 )
 
             # ======================================
@@ -90,24 +155,21 @@ def list_games(request):
 
             elif command == "EXCLUDE_AND":
 
-                exclude_query = Q()
-
-                first = True
+                group_games = Game.objects.all()
 
                 for tag in tags:
 
-                    condition = Q(
+                    group_games = group_games.filter(
                         tags__name__iexact=tag
                     )
 
-                    if first:
-                        exclude_query = condition
-                        first = False
-                    else:
-                        exclude_query &= condition
-
                 exclude_groups.append(
-                    exclude_query
+                    set(
+                        group_games.values_list(
+                            "appid",
+                            flat=True
+                        )
+                    )
                 )
 
             # ======================================
@@ -116,39 +178,50 @@ def list_games(request):
 
             elif command == "EXCLUDE_OR":
 
-                exclude_groups.append(
+                group_games = Game.objects.filter(
                     build_or_query(tags)
                 )
 
+                exclude_groups.append(
+                    set(
+                        group_games.values_list(
+                            "appid",
+                            flat=True
+                        )
+                    )
+                )
+
     # ==========================================
-    # INCLUDE_OR
+    # INCLUDES
     # ==========================================
 
-    if include_or_groups:
+    if include_groups:
 
-        include_query = Q()
+        include_ids = set()
 
-        first = True
+        for group in include_groups:
 
-        for q in include_or_groups:
-
-            if first:
-                include_query = q
-                first = False
-            else:
-                include_query |= q
+            include_ids |= group
 
         games = games.filter(
-            include_query
+            appid__in=include_ids
         )
 
     # ==========================================
     # EXCLUDES
     # ==========================================
 
-    for q in exclude_groups:
+    if exclude_groups:
 
-        games = games.exclude(q)
+        exclude_ids = set()
+
+        for group in exclude_groups:
+
+            exclude_ids |= group
+
+        games = games.exclude(
+            appid__in=exclude_ids
+        )
 
     games = games.distinct()
 
@@ -190,10 +263,13 @@ def list_games(request):
     # ==========================================
 
     try:
+
         page = int(
             request.GET.get("page", 1)
         )
+
     except:
+
         page = 1
 
     per_page = 20
@@ -229,6 +305,10 @@ def list_games(request):
             "review_count": game.review_count,
             "revenue_1year": game.revenue_1year,
             "tags": tags,
+            "screenshot_urls": game.screenshot_urls,
+            "capsule_url": game.capsule_url,
+            "review_count_1year": game.review_count_1year,
+            "review_impression": game.review_impression,
 
         })
 
@@ -242,3 +322,8 @@ def list_games(request):
             (total + per_page - 1) // per_page,
 
     })
+
+
+def list_tags(request):
+    tags = Tag.objects.values_list('name', flat=True).distinct().order_by('name')
+    return JsonResponse(list(tags), safe=False)

@@ -15,6 +15,12 @@ class Game(models.Model):
 
     revenue_1year = models.FloatField(null=True)
 
+    # Novos campos
+    screenshot_urls = models.JSONField(default=list, null=True)
+    capsule_url = models.URLField(max_length=500, null=True)
+    review_count_1year = models.FloatField(null=True)
+    review_impression = models.CharField(max_length=100, null=True)
+
     def __str__(self):
         return self.name
 
