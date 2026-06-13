@@ -33,8 +33,17 @@ class ListGamesAPITest(TestCase):
         self.assertEqual(data["total"], 6)
 
         expected_fields = {
-            "appid", "name", "price", "release_date",
-            "review_count", "revenue_1year", "tags",
+            "appid",
+            "name",
+            "price",
+            "release_date",
+            "review_count",
+            "revenue_1year",
+            "tags",
+            "screenshot_urls",
+            "capsule_url",
+            "review_count_1year",
+            "review_impression",
         }
         for item in data["results"]:
             self.assertEqual(set(item.keys()), expected_fields)

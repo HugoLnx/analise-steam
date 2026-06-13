@@ -31,8 +31,7 @@ def list_games(request):
         ""
     ).strip()
 
-    include_or_groups = []
-
+    include_groups = []
     exclude_groups = []
 
     # ==========================================
@@ -68,11 +67,22 @@ def list_games(request):
 
             if command == "INCLUDE_AND":
 
+                group_games = Game.objects.all()
+
                 for tag in tags:
 
-                    games = games.filter(
+                    group_games = group_games.filter(
                         tags__name__iexact=tag
                     )
+
+                include_groups.append(
+                    set(
+                        group_games.values_list(
+                            "appid",
+                            flat=True
+                        )
+                    )
+                )
 
             # ======================================
             # INCLUDE_OR
@@ -80,8 +90,17 @@ def list_games(request):
 
             elif command == "INCLUDE_OR":
 
-                include_or_groups.append(
+                group_games = Game.objects.filter(
                     build_or_query(tags)
+                )
+
+                include_groups.append(
+                    set(
+                        group_games.values_list(
+                            "appid",
+                            flat=True
+                        )
+                    )
                 )
 
             # ======================================
@@ -90,24 +109,21 @@ def list_games(request):
 
             elif command == "EXCLUDE_AND":
 
-                exclude_query = Q()
-
-                first = True
+                group_games = Game.objects.all()
 
                 for tag in tags:
 
-                    condition = Q(
+                    group_games = group_games.filter(
                         tags__name__iexact=tag
                     )
 
-                    if first:
-                        exclude_query = condition
-                        first = False
-                    else:
-                        exclude_query &= condition
-
                 exclude_groups.append(
-                    exclude_query
+                    set(
+                        group_games.values_list(
+                            "appid",
+                            flat=True
+                        )
+                    )
                 )
 
             # ======================================
@@ -116,39 +132,50 @@ def list_games(request):
 
             elif command == "EXCLUDE_OR":
 
-                exclude_groups.append(
+                group_games = Game.objects.filter(
                     build_or_query(tags)
                 )
 
+                exclude_groups.append(
+                    set(
+                        group_games.values_list(
+                            "appid",
+                            flat=True
+                        )
+                    )
+                )
+
     # ==========================================
-    # INCLUDE_OR
+    # INCLUDES
     # ==========================================
 
-    if include_or_groups:
+    if include_groups:
 
-        include_query = Q()
+        include_ids = set()
 
-        first = True
+        for group in include_groups:
 
-        for q in include_or_groups:
-
-            if first:
-                include_query = q
-                first = False
-            else:
-                include_query |= q
+            include_ids |= group
 
         games = games.filter(
-            include_query
+            appid__in=include_ids
         )
 
     # ==========================================
     # EXCLUDES
     # ==========================================
 
-    for q in exclude_groups:
+    if exclude_groups:
 
-        games = games.exclude(q)
+        exclude_ids = set()
+
+        for group in exclude_groups:
+
+            exclude_ids |= group
+
+        games = games.exclude(
+            appid__in=exclude_ids
+        )
 
     games = games.distinct()
 
@@ -190,10 +217,13 @@ def list_games(request):
     # ==========================================
 
     try:
+
         page = int(
             request.GET.get("page", 1)
         )
+
     except:
+
         page = 1
 
     per_page = 20
