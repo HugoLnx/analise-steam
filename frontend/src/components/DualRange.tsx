@@ -1,5 +1,7 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
-//Componente alternativo para MinMaxFilter, usando um range slider duplo para representar o intervalo, com a opção de desabilitar o min ou max para representar "sem limite".
+import React, { useCallback, useEffect, useRef } from 'react';
+
+// Componente alternativo para MinMaxFilter, usando um range slider duplo para representar o intervalo, 
+// com a opção de desabilitar o min ou max para representar "sem limite".
 const DualRange: React.FC<{
   label: string;
   min: number;
@@ -15,8 +17,11 @@ const DualRange: React.FC<{
   step?: number;
   prefix?: string;
 }> = ({ label, min, max, minVal, maxVal, setMin, setMax, noMin, setNoMin, noMax, setNoMax, step = 1, prefix = "" }) => {
-  const [minThumb, setMinThumb] = useState(Number(minVal) || min);
-  const [maxThumb, setMaxThumb] = useState(Number(maxVal) || max);
+  
+  // Deriva os valores numéricos diretamente das props para evitar estado redundante e avisos de cascading renders.
+  const numericMin = minVal === "" ? min : Number(minVal);
+  const numericMax = maxVal === "" ? max : Number(maxVal);
+  
   const rangeRef = useRef<HTMLDivElement>(null);
 
   const getPercent = useCallback(
@@ -24,15 +29,16 @@ const DualRange: React.FC<{
     [min, max]
   );
 
+  // Sincroniza a largura da barra visual (track) com os valores atuais.
   useEffect(() => {
     if (rangeRef.current) {
-      const minPercent = noMin ? 0 : getPercent(minThumb);
-      const maxPercent = noMax ? 100 : getPercent(maxThumb);
+      const minPercent = noMin ? 0 : getPercent(numericMin);
+      const maxPercent = noMax ? 100 : getPercent(numericMax);
 
       rangeRef.current.style.left = `${minPercent}%`;
       rangeRef.current.style.width = `${maxPercent - minPercent}%`;
     }
-  }, [minThumb, maxThumb, getPercent, noMin, noMax]);
+  }, [numericMin, numericMax, getPercent, noMin, noMax]);
 
   return (
     <div className="filter-group range-group">
@@ -49,6 +55,46 @@ const DualRange: React.FC<{
           </label>
         </div>
       </div>
+
+      <div className="manual-inputs-row">
+        <div className="manual-input-item">
+          <span className="input-prefix">{prefix}</span>
+          <input
+            type="number"
+            className="manual-range-input-large"
+            value={minVal}
+            step={step}
+            disabled={noMin}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              if (!isNaN(val)) {
+                const safeVal = Math.min(Math.max(val, min), numericMax - step);
+                setMin(safeVal.toString());
+              }
+            }}
+            placeholder="Min"
+          />
+        </div>
+        <div className="manual-inputs-separator">to</div>
+        <div className="manual-input-item">
+          <span className="input-prefix">{prefix}</span>
+          <input
+            type="number"
+            className="manual-range-input-large"
+            value={maxVal}
+            step={step}
+            disabled={noMax}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              if (!isNaN(val)) {
+                const safeVal = Math.max(Math.min(val, max), numericMin + step);
+                setMax(safeVal.toString());
+              }
+            }}
+            placeholder="Max"
+          />
+        </div>
+      </div>
       
       <div className="dual-range-visual">
         <div className="multi-range-slider">
@@ -57,40 +103,32 @@ const DualRange: React.FC<{
             min={min}
             max={max}
             step={step}
-            value={noMin ? min : minThumb}
+            value={noMin ? min : numericMin}
             onChange={(event) => {
-              const value = Math.min(Number(event.target.value), maxThumb - step);
-              setMinThumb(value);
+              const value = Math.min(Number(event.target.value), numericMax - step);
               setMin(value.toString());
               setNoMin(false);
             }}
             className={`thumb thumb--left ${noMin ? 'disabled' : ''}`}
-            style={{ zIndex: (minThumb > max - 100 || minThumb === maxThumb) ? "10" : "6" }}
+            style={{ zIndex: (numericMin > max - 100 || numericMin === numericMax) ? "10" : "6" }}
             disabled={noMin}
           />
-          <div className="thumb-label thumb-label--left" style={{ left: `${noMin ? 0 : getPercent(minThumb)}%` }}>
-            {noMin ? '∞' : `${prefix}${minThumb}`}
-          </div>
 
           <input
             type="range"
             min={min}
             max={max}
             step={step}
-            value={noMax ? max : maxThumb}
+            value={noMax ? max : numericMax}
             onChange={(event) => {
-              const value = Math.max(Number(event.target.value), minThumb + step);
-              setMaxThumb(value);
+              const value = Math.max(Number(event.target.value), numericMin + step);
               setMax(value.toString());
               setNoMax(false);
             }}
             className={`thumb thumb--right ${noMax ? 'disabled' : ''}`}
-            style={{ zIndex: (minThumb > max - 100 || minThumb === maxThumb) ? "6" : "10" }}
+            style={{ zIndex: (numericMin > max - 100 || numericMin === numericMax) ? "6" : "10" }}
             disabled={noMax}
           />
-          <div className="thumb-label thumb-label--right" style={{ left: `${noMax ? 100 : getPercent(maxThumb)}%` }}>
-            {noMax ? '∞' : `${prefix}${maxThumb}`}
-          </div>
 
           <div className="slider">
             <div className="slider__track" />
