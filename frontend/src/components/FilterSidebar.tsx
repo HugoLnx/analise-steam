@@ -191,7 +191,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
       />
 
       <DualRange
-        label="Weeks Ago"
+        label="Release Date"
         min={0}
         max={520}
         minVal={weeksMin}
