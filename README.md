@@ -4,14 +4,15 @@
 >
 > * Expandir a seção de Descrição incluindo os objetivos do projeto e o Modelo Conceitual BFD (Basic Functional Design).
 > * Adicionar seção detalhada de Autoria e Responsabilidade mapeando as contribuições de cada participante do grupo.
-> * Documentar as regras e padrões de commits aceitos no repositório para manter a padronização.
 
 > **⚠️ TODO: #21 - Setup Docker & Docker-Compose**
+>
 > * Criar `Dockerfile` na raiz para o Backend Django (utilizar Python 3.x-slim e expor porta 8000).
 > * Criar `Dockerfile` dentro da pasta `frontend/` para o React (utilizar Node.js para build e opcionalmente Nginx para servir os estáticos ou apenas node para dev).
 > * Criar `docker-compose.yml` na raiz orquestrando dois serviços independentes:
->   * `backend`: Deve montar volume para o `db.sqlite3` para persistência e rodar as migrations no startup.
->   * `frontend`: Deve se comunicar com o backend via URL de API configurável (variável de ambiente).
+>    * `backend`: Deve montar volume para o `db.sqlite3` para persistência e rodar as migrations no startup.
+>    * `frontend`: Deve se comunicar com o backend via URL de API configurável (variável de ambiente).
+>
 > * Garantir que a `CORS_ALLOWED_ORIGINS` no Django aceite a origem do container frontend.
 
 ## 📌 Descrição
@@ -36,6 +37,7 @@ Este projeto tem como objetivo importar dados de jogos extraídos da Steam (via 
 git clone https://github.com/JoaoLopes07/analise-steam.git
 cd steam_analytics
 
+
 ```
 
 ---
@@ -46,6 +48,7 @@ cd steam_analytics
 python -m venv venv
 venv\Scripts\activate  # Windows
 
+
 ```
 
 ---
@@ -54,6 +57,7 @@ venv\Scripts\activate  # Windows
 
 ```bash
 pip install django
+
 
 ```
 
@@ -64,6 +68,7 @@ pip install django
 ```bash
 python manage.py makemigrations
 python manage.py migrate
+
 
 ```
 
@@ -81,6 +86,7 @@ steam_analytics/
  ├── manage.py
  ├── games.json
 
+
 ```
 
 Rodar:
@@ -88,12 +94,14 @@ Rodar:
 ```bash
 python import_json.py games.json
 
+
 ```
 
 Se tudo estiver correto, será exibido:
 
 ```sh
 Importação finalizada!
+
 
 ```
 
@@ -103,6 +111,7 @@ Importação finalizada!
 
 ```bash
 python manage.py createsuperuser
+
 
 ```
 
@@ -119,6 +128,7 @@ Preencher:
 ```bash
 python manage.py runserver
 
+
 ```
 
 ---
@@ -131,12 +141,14 @@ A suíte de testes usa SQLite em memória — não é necessário configuração
 cd steam_analytics
 python manage.py test games --verbosity=2
 
+
 ```
 
 Para rodar apenas os testes da API de jogos:
 
 ```bash
 python manage.py test games.tests.test_list_games --verbosity=2
+
 
 ```
 
@@ -148,6 +160,7 @@ Abrir no navegador:
 
 ```sh
 http://127.0.0.1:8000/admin
+
 
 ```
 
@@ -165,6 +178,7 @@ Acesse o diretório e instale as dependências:
 cd frontend
 npm i
 
+
 ```
 
 ---
@@ -178,6 +192,7 @@ cd frontend
 npm run dev
 
 Frontend React rodando em http://localhost:5173
+
 
 ```
 
