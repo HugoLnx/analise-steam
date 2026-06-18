@@ -29,10 +29,15 @@ def list_games(request):
     # ==========================================
     # NOVOS FILTROS
     # ==========================================
+    # TODO: #32 - Capturar as strings ou IDs correspondentes às funcionalidades selecionadas (Ex: request.GET.get("features", ""))
+    # TODO: #32 - Tratar a query com delimitadores ou realizar filtros cruzados Q() caso o jogo precise conter todas ou pelo menos uma funcionalidade
     title = request.GET.get("title", "").strip()
     if title:
         games = games.filter(name__icontains=title)
 
+    # TODO: #18 - Criar um script ou estender o importador para baixar/ler o arquivo remoto de referência (https://github.com/user-attachments/files/29065218/all-br-games.txt)
+    # TODO: #18 - O arquivo contém IDs (um por linha); o script deve injetar um campo booleano 'is_only_br' no db/games.json ou associar uma tag 'brazilian' para estes appids correspondentes
+    # TODO: #18 - Otimizar a busca abaixo para filtrar usando o campo ou tag injetada de maneira performática
     only_br = request.GET.get("only_br", "false").lower() == "true"
     if only_br:
         games = games.filter(tags__name__iexact="brazilian")

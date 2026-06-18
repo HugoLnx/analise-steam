@@ -16,6 +16,8 @@ class Game(models.Model):
     revenue_1year = models.FloatField(null=True)
 
     # Novos campos
+    # TODO: #22 - Criar um models.JSONField(default=list, null=True) ou uma tabela/relação ManyToMany dedicada para registrar as Funcionalidades de cada jogo (ex: Single-player, Multi-player, Co-op)
+    # TODO: #22 - Rodar os comandos 'python manage.py makemigrations' e 'python manage.py migrate' após a inclusão do novo campo para atualizar a tabela local
     screenshot_urls = models.JSONField(default=list, null=True)
     capsule_url = models.URLField(max_length=500, null=True)
     review_count_1year = models.FloatField(null=True)

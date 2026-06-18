@@ -31,9 +31,12 @@ const GameCard = ({ game }: { game: Game }) => {
         <h2 className="game-name">{game.name}</h2>
         <div className="badges-row">
           <span className="badge rating">
+            {/* TODO: #28 - Criar uma função utilitária ou helper de formatação amigável (pretty format) */}
+            {/* TODO: #28 - Se review_count for maior que 1000, exibir como '1.2k', se maior que 1000000, exibir como '1.2M' */}
             {(game.review_count_1year || 0).toFixed(1)} ({game.review_count || 0} {game.review_impression || "No Reviews"})
           </span>
           <span className="badge price">${game.price ?? 0}</span>
+          {/* TODO: #28 - Formatar o valor da receita com separador de milhar adequado dependendo do padrão visual da moeda */}
           <span className="badge revenue">${((game.revenue_1year || 0) / 1000000).toFixed(2)}M BRL</span>
           <span className="badge age">{diffYears} years</span>
         </div>

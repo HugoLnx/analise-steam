@@ -50,6 +50,8 @@ def import_json(source):
                 "capsule_url": raw.get("capsule_url"),
                 "review_count_1year": raw.get("review_count_1year"),
                 "review_impression": raw.get("review_impression"),
+                # TODO: #22 - Localizar e extrair a chave de array/objeto correspondente às funcionalidades do jogo dentro do JSON (ex: raw.get("features", []))
+                # TODO: #22 - Inserir de forma sanitizada os metadados no novo campo ou tabela mapeada no modelo Game
             }
         )
 
@@ -57,6 +59,9 @@ def import_json(source):
         Tag.objects.filter(game=game_obj).delete()
         for tag in raw.get("raw_main_tags", []):
             Tag.objects.create(game=game_obj, name=tag)
+
+        # TODO: #18 - Criar lógica ou comando adicional para baixar/ler as linhas de IDs do arquivo txt externo (https://github.com/user-attachments/files/29065218/all-br-games.txt)
+        # TODO: #18 - Verificar se o `game_obj.appid` atual está contido nessa lista e automaticamente criar/garantir a Tag(name="brazilian") ou campo específico correspondente
 
         # rankings
         Ranking.objects.filter(game=game_obj).delete()

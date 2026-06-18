@@ -9,7 +9,9 @@ interface MultiSelectDropdownProps {
   placeholder?: string;
   hideLabel?: boolean;
 }
-
+// TODO: #30 - Adicionar um campo <input type="text"> para busca textual dentro do menu aberto (dropdown-menu)
+// TODO: #30 - Filtrar a lista de `options` exibidas com base no valor digitado (ex: options.filter(opt => opt.toLowerCase().includes(searchTerm.toLowerCase())))
+// TODO: #30 - Exibir uma mensagem como "Nenhuma tag encontrada" caso o filtro não retorne nenhum resultado
 export function MultiSelectDropdown({
   label,
   options,

@@ -5,6 +5,9 @@ import FilterSidebar from './components/FilterSidebar';
 import type { TagClause } from './components/TagClauseFilter';
 
 function App() {
+  // TODO: #29 - Carregar no useEffect inicial as configurações salvas no localStorage (filtros ativos, sortBy, página atual)
+  // TODO: #29 - Adicionar um useEffect que observe mudanças nos filtros e chame localStorage.setItem('filters', JSON.stringify(...)) para persistência
+  // TODO: #29 - Garantir que o botão 'Reset' limpe as chaves salvas correspondentes no localStorage para sincronizar a sessão
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

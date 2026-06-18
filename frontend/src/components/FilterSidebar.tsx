@@ -144,7 +144,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
       </div>
 
       <hr />
-
+      {/* TODO: #27 - Configurar min/max reais e step para Reviews de 1 Ano (Ex: min: 0, max: 1000000, step: 1000) */}
+      {/* TODO: #27 - Garantir que a alteração manual nos inputs de texto reflita perfeitamente nos sliders sem lag */}
       <DualRange
         label="Reviews 1 Year"
         min={0}
@@ -158,7 +159,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         noMax={revNoMax}
         setNoMax={setRevNoMax}
       />
-
+      {/* TODO: #27 - Configurar min/max reais e step para Receita de 1 Ano (Ex: min: 0, max: 1000000000, step: 50000) */}
+      {/* TODO: #27 - Validar formatação do prefixo e garantir que valores grandes não quebrem o layout do input */}
       <DualRange
         label="Revenue 1 Year"
         min={0}
@@ -173,7 +175,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         setNoMax={setRevenueNoMax}
         prefix="$"
       />
-
+      {/* TODO: #27 - Configurar min/max reais e step para Preço (Ex: min: 0, max: 500, step: 0.01 ou 0.99 para centavos) */}
+      {/* TODO: #27 - Corrigir o arredondamento de casas decimais (toFixed(2)) ao arrastar a thumb de preço */}
       <DualRange
         label="Price"
         min={0}
@@ -189,7 +192,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         setNoMax={setPriceNoMax}
         prefix="$"
       />
-
+      {/* TODO: #27 - Configurar min/max reais e step para Release Date em semanas (Ex: min: 0, max: 520, step: 1) */}
+      {/* TODO: #27 - Adicionar uma legenda ou tooltip convertendo o número de semanas para anos/meses dinamicamente */}
       <DualRange
         label="Release Date"
         min={0}
@@ -204,47 +208,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         setNoMax={setWeeksNoMax}
       />
 
-      {/* Código anterior, com filtersTags separados <hr />
-
-      <div className="filter-group">
-        <label>Tags INCLUDE (AND)</label>
-        <input
-          type="text"
-          placeholder="e.g. Action, RPG"
-          value={includeAnd}
-          onChange={(e) => setIncludeAnd(e.target.value)}
-        />
-      </div>
-
-      <div className="filter-group">
-        <label>Tags INCLUDE (OR)</label>
-        <input
-          type="text"
-          placeholder="e.g. Indie, Adventure"
-          value={includeOr}
-          onChange={(e) => setIncludeOr(e.target.value)}
-        />
-      </div>
-
-      <div className="filter-group">
-        <label>Tags EXCLUDE (AND)</label>
-        <input
-          type="text"
-          placeholder="Tags to exclude..."
-          value={excludeAnd}
-          onChange={(e) => setExcludeAnd(e.target.value)}
-        />
-      </div>
-
-      <div className="filter-group">
-        <label>Tags EXCLUDE (OR)</label>
-        <input
-          type="text"
-          placeholder="Tags to exclude..."
-          value={excludeOr}
-          onChange={(e) => setExcludeOr(e.target.value)}
-        />
-      </div> */}
+      {/* TODO: #31 - Criar seção visual ou novos componentes dropdown dedicados exclusivamente para filtros de Funcionalidade (Ex: Single-player, Multi-player) */}
+      {/* TODO: #31 - Criar componente de filtro para Localização (Ex: Idiomas suportados, legendas ou dublagem em PT-BR) */}
 
       <div className="sidebar-buttons">
         <button className="btn-reset" onClick={handleReset}>

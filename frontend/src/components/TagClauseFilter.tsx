@@ -98,6 +98,26 @@ export function TagClauseFilter({ availableTags, clauses, onChange }: TagClauseF
                     placeholder="Tags..."
                     hideLabel
                   />
+                  
+                  {/* TODO: #31 - Conectar este dropdown de Features a uma lista ou estado contendo apenas as funcionalidades dos jogos */}
+                  {/* TODO: #31 - Atualizar o gerenciamento de estado para salvar de forma separada das tags genéricas */}
+                  <MultiSelectDropdown
+                    label="Tags"
+                    options={availableTags}
+                    selectedValues={clause.tags}
+                    onChange={(tags) => updateClauseTags(clause.id, tags)}
+                    placeholder="Features..."
+                    hideLabel
+                  />
+                  
+                  <MultiSelectDropdown
+                    label="Tags"
+                    options={availableTags}
+                    selectedValues={clause.tags}
+                    onChange={(tags) => updateClauseTags(clause.id, tags)}
+                    placeholder="Multiplayer..."
+                    hideLabel
+                  />
 
                   <div className="clause-edit-actions">
                     <button 
