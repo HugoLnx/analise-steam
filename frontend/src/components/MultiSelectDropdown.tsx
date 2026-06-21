@@ -1,6 +1,49 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 
+interface DropdownMenuProps {
+  options: string[];
+  selectedValues: string[];
+  onToggle: (value: string) => void;
+}
+
+function DropdownMenu({ options, selectedValues, onToggle }: DropdownMenuProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredOptions = options.filter(option =>
+    option.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="dropdown-menu">
+      <div className="dropdown-search-container">
+        <input
+          type="text"
+          className="dropdown-search-input"
+          placeholder="Buscar tag..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          autoFocus
+        />
+      </div>
+
+      {filteredOptions.length > 0 ? (
+        filteredOptions.map(option => (
+          <label key={option} className="dropdown-item">
+            <input
+              type="checkbox"
+              checked={selectedValues.includes(option)}
+              onChange={() => onToggle(option)}
+            />
+            <span>{option}</span>
+          </label>
+        ))
+      ) : (
+        <div className="dropdown-no-results">Nenhuma tag encontrada</div>
+      )}
+    </div>
+  );
+}
 interface MultiSelectDropdownProps {
   label: string;
   options: string[];
@@ -9,9 +52,7 @@ interface MultiSelectDropdownProps {
   placeholder?: string;
   hideLabel?: boolean;
 }
-// TODO: #30 - Adicionar um campo <input type="text"> para busca textual dentro do menu aberto (dropdown-menu)
-// TODO: #30 - Filtrar a lista de `options` exibidas com base no valor digitado (ex: options.filter(opt => opt.toLowerCase().includes(searchTerm.toLowerCase())))
-// TODO: #30 - Exibir uma mensagem como "Nenhuma tag encontrada" caso o filtro não retorne nenhum resultado
+
 export function MultiSelectDropdown({
   label,
   options,
@@ -49,11 +90,7 @@ export function MultiSelectDropdown({
 
   return (
     <div className={`filter-group dropdown-container ${hideLabel ? 'no-label' : ''}`} ref={dropdownRef}>
-      {!hideLabel && (
-        <label className="filter-label">
-          {label}
-        </label>
-      )}
+      {!hideLabel && <label className="filter-label">{label}</label>}
 
       <div className="relative-container">
         <button
@@ -67,36 +104,20 @@ export function MultiSelectDropdown({
         </button>
 
         {isOpen && (
-          <div className="dropdown-menu">
-            {options.map(option => (
-              <label
-                key={option}
-                className="dropdown-item"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedValues.includes(option)}
-                  onChange={() => handleToggle(option)}
-                />
-                <span>{option}</span>
-              </label>
-            ))}
-          </div>
+          <DropdownMenu 
+            options={options}
+            selectedValues={selectedValues}
+            onToggle={handleToggle}
+          />
         )}
       </div>
 
       {selectedValues.length > 0 && (
         <div className="selected-tags">
           {selectedValues.map(value => (
-            <span
-              key={value}
-              className="selected-tag"
-            >
+            <span key={value} className="selected-tag">
               {value}
-              <button
-                onClick={(e) => handleRemove(value, e)}
-                className="remove-tag-btn"
-              >
+              <button onClick={(e) => handleRemove(value, e)} className="remove-tag-btn">
                 <X size={10} />
               </button>
             </span>
