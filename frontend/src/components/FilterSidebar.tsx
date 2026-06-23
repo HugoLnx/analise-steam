@@ -50,6 +50,7 @@ interface FilterSidebarProps {
   availableTags: string[];
   tagClauses: TagClause[];
   setTagClauses: (clauses: TagClause[]) => void;
+  onReset?: () => void;
 }
 
 const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
@@ -78,9 +79,13 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
     weeksNoMin, setWeeksNoMin,
     weeksNoMax, setWeeksNoMax,
     setTagClauses,
+    onReset,
   } = props;
   
   const handleReset = () => {
+    if (onReset) {
+      onReset();
+    }
     setIncludeAnd('');
     setIncludeOr('');
     setExcludeAnd('');
