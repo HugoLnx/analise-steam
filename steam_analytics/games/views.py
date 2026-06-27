@@ -71,25 +71,68 @@ def list_games(request):
         for field, value in parsed:
             by_field.setdefault(field, []).append(value)
 
-        for field, values in by_field.items():
-            if clause_command == 'INCLUDE_AND':
-                for v in values:
-                    qs = qs.filter(**{f'{field}__contains': [v]})
-            elif clause_command == 'INCLUDE_OR':
-                query = Q()
-                for v in values:
-                    query |= Q(**{f'{field}__contains': [v]})
-                qs = qs.filter(query)
-            elif clause_command == 'EXCLUDE_AND':
-                for v in values:
-                    qs = qs.exclude(**{f'{field}__contains': [v]})
-            elif clause_command == 'EXCLUDE_OR':
-                query = Q()
-                for v in values:
-                    query |= Q(**{f'{field}__contains': [v]})
-                qs = qs.exclude(query)
+        # Importante:
+        # Em alguns backends/DBs, lookup `__contains` em JSONField não é suportado.
+        # Para evitar 500, fazemos o filtro em Python (garantindo compatibilidade).
+        # O custo é maior do que filtrar no banco, mas mantém a funcionalidade.
 
-        return qs
+        def _field_has_value(item_list, v: str) -> bool:
+            if not item_list:
+                return False
+            if isinstance(item_list, list):
+                return v in [str(x) for x in item_list]
+            return str(item_list) == v
+
+        # Materializa apenas o necessário para avaliação em Python.
+        # (mantém `appid` e os campos funcionais)
+        only_fields = set(by_field.keys())
+        rows = list(qs.values_list('appid', *only_fields))
+
+        # index: appid -> valores por campo
+        appid_to_fields = {}
+        for row in rows:
+            appid = row[0]
+            field_values = row[1:]
+            appid_to_fields[appid] = dict(zip(only_fields, field_values))
+
+        matched_appids = None
+
+        for field, values in by_field.items():
+            values = [str(x) for x in values]
+
+            if clause_command in ('INCLUDE_AND', 'INCLUDE_OR'):
+                current = set()
+                for appid, fvals in appid_to_fields.items():
+                    field_value = fvals.get(field)
+                    if clause_command == 'INCLUDE_AND':
+                        if all(_field_has_value(field_value, v) for v in values):
+                            current.add(appid)
+                    else:  # INCLUDE_OR
+                        if any(_field_has_value(field_value, v) for v in values):
+                            current.add(appid)
+
+                matched_appids = current if matched_appids is None else (matched_appids & current)
+
+            elif clause_command in ('EXCLUDE_AND', 'EXCLUDE_OR'):
+                current = set()
+                for appid, fvals in appid_to_fields.items():
+                    field_value = fvals.get(field)
+                    if clause_command == 'EXCLUDE_AND':
+                        # remove quem contém TODAS as values (AND por valor)
+                        if not all(_field_has_value(field_value, v) for v in values):
+                            current.add(appid)
+                    else:  # EXCLUDE_OR
+                        # remove quem contém QUALQUER value (OR por valor)
+                        if not any(_field_has_value(field_value, v) for v in values):
+                            current.add(appid)
+
+                matched_appids = current if matched_appids is None else (matched_appids & current)
+
+        # Se nada foi filtrado (casos extremos), retorna qs original
+        if matched_appids is None:
+            return qs
+
+        return qs.filter(appid__in=matched_appids)
 
     title = request.GET.get("title", "").strip()
     if title:
