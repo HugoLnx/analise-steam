@@ -4,14 +4,26 @@
 import type { FuncOptionsByCategory } from './funcTagClauseUtils';
 
 
-export function getDefaultOptionsByCategory(): FuncOptionsByCategory {
-  return {
-    features: [],
-    multiplayer: [],
-    gamepad: [],
-    steamdeck: [],
-    languages: [],
-  };
+export async function fetchOptionsByCategory(): Promise<FuncOptionsByCategory> {
+  // Load options from backend so dropdowns are populated.
+  // We fallback to empty arrays to avoid breaking the UI.
+  try {
+    const resp = await fetch('http://localhost:8000/api/func_options/');
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    return (await resp.json()) as FuncOptionsByCategory;
+  } catch (e) {
+    console.error('Error fetching func options', e);
+    return {
+      features: [],
+      multiplayer: [],
+      gamepad: [],
+      steamdeck: [],
+      languages: [],
+    };
+  }
 }
+
+
+
 
 
