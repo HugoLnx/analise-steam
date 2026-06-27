@@ -124,6 +124,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
     setWeeksNoMin(true);
     setWeeksNoMax(true);
     setTagClauses([]);
+    setFuncClauses([]);
   };
 
   return (
@@ -239,8 +240,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         setNoMax={setWeeksNoMax}
       />
 
-      {/* TODO: #31 - Criar seção visual ou novos componentes dropdown dedicados exclusivamente para filtros de Funcionalidade (Ex: Single-player, Multi-player) */}
-      {/* TODO: #31 - Criar componente de filtro para Localização (Ex: Idiomas suportados, legendas ou dublagem em PT-BR) */}
 
       <div className="sidebar-buttons">
         <button className="btn-reset" onClick={handleReset}>

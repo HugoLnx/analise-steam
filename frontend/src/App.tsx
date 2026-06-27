@@ -5,7 +5,8 @@ import FilterSidebar from './components/FilterSidebar';
 import type { TagClause } from './components/TagClauseFilter';
 import type { FuncOptionsByCategory, FuncTagClause } from './components/funcTagClauseUtils';
 
-import { getDefaultOptionsByCategory } from './components/FuncOptionsProvider';
+import { fetchOptionsByCategory } from './components/FuncOptionsProvider';
+
 
 
 function App() {
@@ -57,7 +58,14 @@ function App() {
 
   // TODO #31 - Funcionalidades
   const [funcClauses, setFuncClauses] = useState<FuncTagClause[]>(initialFilters.funcClauses ?? []);
-  const [funcOptionsByCategory] = useState<FuncOptionsByCategory>(getDefaultOptionsByCategory());
+  const [funcOptionsByCategory, setFuncOptionsByCategory] = useState<FuncOptionsByCategory>({
+    features: [],
+    multiplayer: [],
+    gamepad: [],
+    steamdeck: [],
+    languages: [],
+  });
+
 
 
 
@@ -80,6 +88,16 @@ function App() {
     fetchTags();
   }, []);
 
+  // Fetch functional options (features/multiplayer/etc)
+  useEffect(() => {
+    const run = async () => {
+      const opts = await fetchOptionsByCategory();
+      setFuncOptionsByCategory(opts);
+    };
+    run();
+  }, []);
+
+
 
 
   // Save to localStorage when states change
@@ -89,7 +107,7 @@ function App() {
       title, onlyBr,
       reviewsMin, reviewsMax, revenueMin, revenueMax, priceMin, priceMax, weeksMin, weeksMax,
       revNoMin, revNoMax, revenueNoMin, revenueNoMax, priceNoMin, priceNoMax, weeksNoMin, weeksNoMax,
-      tagClauses, sortBy, currentPage
+      tagClauses, funcClauses, sortBy, currentPage
     };
     localStorage.setItem('filters', JSON.stringify(filters));
   }, [
@@ -97,7 +115,7 @@ function App() {
     title, onlyBr,
     reviewsMin, reviewsMax, revenueMin, revenueMax, priceMin, priceMax, weeksMin, weeksMax,
     revNoMin, revNoMax, revenueNoMin, revenueNoMax, priceNoMin, priceNoMax, weeksNoMin, weeksNoMax,
-    tagClauses, sortBy, currentPage
+    tagClauses, funcClauses, sortBy, currentPage
   ]);
 
   const fetchGames = useCallback(async (page: number) => {
@@ -139,6 +157,7 @@ function App() {
           page: page,
           sort: sortBy,
           filter_tags: filterTags,
+
 
           title: title,
           only_br: onlyBr,

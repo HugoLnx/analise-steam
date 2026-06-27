@@ -99,8 +99,6 @@ export function TagClauseFilter({ availableTags, clauses, onChange }: TagClauseF
                     hideLabel
                   />
                   
-                  {/* TODO: #31 - Conectar este dropdown de Features a uma lista ou estado contendo apenas as funcionalidades dos jogos */}
-                  {/* TODO: #31 - Atualizar o gerenciamento de estado para salvar de forma separada das tags genéricas */}
 
                   <div className="clause-edit-actions">
                     <button 
