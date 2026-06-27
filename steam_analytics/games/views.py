@@ -29,8 +29,68 @@ def list_games(request):
     # ==========================================
     # NOVOS FILTROS
     # ==========================================
-    # TODO: #32 - Capturar as strings ou IDs correspondentes às funcionalidades selecionadas (Ex: request.GET.get("features", ""))
-    # TODO: #32 - Tratar a query com delimitadores ou realizar filtros cruzados Q() caso o jogo precise conter todas ou pelo menos uma funcionalidade
+    # TODO: #32 - Estendido via `filter_tags` com prefixos de categoria.
+    # Exemplo de tag:
+    #   features:Co-op
+    #   multiplayer:Single-player
+    #   languages:Portuguese
+    
+    # Formato do filtro: mesmo esquema atual em `filter_tags`, só que cada tag vem como "categoria:valor".
+    categoria_map = {
+        'features': 'features',
+        'multiplayer': 'multiplayer_support',
+        'gamepad': 'gamepad_support',
+        'steamdeck': 'steamdeck_support',
+        'languages': 'languages',
+    }
+
+    def parse_functional_tag(token: str):
+        token = (token or '').strip()
+        if ':' not in token:
+            return None
+        cat, val = token.split(':', 1)
+        cat = cat.strip()
+        val = val.strip()
+        if not cat or not val:
+            return None
+        model_field = categoria_map.get(cat)
+        if not model_field:
+            return None
+        return model_field, val
+
+    def apply_clause_to_queryset(qs, clause_command: str, tokens: list[str]):
+        # INCLUDE_AND/EXCLUDE_AND => todas as tokens (AND por token)
+        # INCLUDE_OR/EXCLUDE_OR  => qualquer token (OR por token)
+        parsed = [parse_functional_tag(t) for t in tokens]
+        parsed = [p for p in parsed if p is not None]
+        if not parsed:
+            return qs
+
+        # Agrupar por campo (caso venham múltiplas categorias no mesmo clause)
+        by_field = {}
+        for field, value in parsed:
+            by_field.setdefault(field, []).append(value)
+
+        for field, values in by_field.items():
+            if clause_command == 'INCLUDE_AND':
+                for v in values:
+                    qs = qs.filter(**{f'{field}__contains': [v]})
+            elif clause_command == 'INCLUDE_OR':
+                query = Q()
+                for v in values:
+                    query |= Q(**{f'{field}__contains': [v]})
+                qs = qs.filter(query)
+            elif clause_command == 'EXCLUDE_AND':
+                for v in values:
+                    qs = qs.exclude(**{f'{field}__contains': [v]})
+            elif clause_command == 'EXCLUDE_OR':
+                query = Q()
+                for v in values:
+                    query |= Q(**{f'{field}__contains': [v]})
+                qs = qs.exclude(query)
+
+        return qs
+
     title = request.GET.get("title", "").strip()
     if title:
         games = games.filter(name__icontains=title)
@@ -113,88 +173,48 @@ def list_games(request):
             ]
 
             # ======================================
-            # INCLUDE_AND
+            # INCLUDE / EXCLUDE
             # ======================================
 
-            if command == "INCLUDE_AND":
+            # Se os tokens tiverem prefixo de funcionalidade (categoria:valor),
+            # aplicamos nos campos JSON do model Game. Caso contrário, mantém
+            # compatibilidade com filtro por Tag (tags__name__...).
 
-                group_games = Game.objects.all()
+            uses_functional_tokens = any(':' in t for t in tags)
 
-                for tag in tags:
+            # tokens podem conter múltiplas tags da mesma categoria.
+            # Inclusive, "tags" podem incluir tokens sem ':' (ignora no apply_clause_to_queryset).
 
-                    group_games = group_games.filter(
-                        tags__name__iexact=tag
-                    )
 
-                include_groups.append(
-                    set(
-                        group_games.values_list(
-                            "appid",
-                            flat=True
-                        )
-                    )
-                )
+            if uses_functional_tokens:
+                if command == "INCLUDE_AND" or command == "INCLUDE_OR" :
+                    group_games = apply_clause_to_queryset(Game.objects.all(), command, tags)
+                    include_groups.append(set(group_games.values_list("appid", flat=True)))
+                elif command == "EXCLUDE_AND" or command == "EXCLUDE_OR":
+                    group_games = apply_clause_to_queryset(Game.objects.all(), command, tags)
+                    exclude_groups.append(set(group_games.values_list("appid", flat=True)))
 
-            # ======================================
-            # INCLUDE_OR
-            # ======================================
+            else:
+                if command == "INCLUDE_AND":
+                    group_games = Game.objects.all()
+                    for tag in tags:
+                        group_games = group_games.filter(tags__name__iexact=tag)
+                    include_groups.append(set(group_games.values_list("appid", flat=True)))
 
-            elif command == "INCLUDE_OR":
+                elif command == "INCLUDE_OR":
+                    group_games = Game.objects.filter(build_or_query(tags))
+                    include_groups.append(set(group_games.values_list("appid", flat=True)))
 
-                group_games = Game.objects.filter(
-                    build_or_query(tags)
-                )
+                elif command == "EXCLUDE_AND":
+                    group_games = Game.objects.all()
+                    for tag in tags:
+                        group_games = group_games.filter(tags__name__iexact=tag)
+                    exclude_groups.append(set(group_games.values_list("appid", flat=True)))
 
-                include_groups.append(
-                    set(
-                        group_games.values_list(
-                            "appid",
-                            flat=True
-                        )
-                    )
-                )
+                elif command == "EXCLUDE_OR":
+                    group_games = Game.objects.filter(build_or_query(tags))
+                    exclude_groups.append(set(group_games.values_list("appid", flat=True)))
 
-            # ======================================
-            # EXCLUDE_AND
-            # ======================================
-
-            elif command == "EXCLUDE_AND":
-
-                group_games = Game.objects.all()
-
-                for tag in tags:
-
-                    group_games = group_games.filter(
-                        tags__name__iexact=tag
-                    )
-
-                exclude_groups.append(
-                    set(
-                        group_games.values_list(
-                            "appid",
-                            flat=True
-                        )
-                    )
-                )
-
-            # ======================================
-            # EXCLUDE_OR
-            # ======================================
-
-            elif command == "EXCLUDE_OR":
-
-                group_games = Game.objects.filter(
-                    build_or_query(tags)
-                )
-
-                exclude_groups.append(
-                    set(
-                        group_games.values_list(
-                            "appid",
-                            flat=True
-                        )
-                    )
-                )
 
     # ==========================================
     # INCLUDES
