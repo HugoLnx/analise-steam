@@ -5,47 +5,54 @@ import FilterSidebar from './components/FilterSidebar';
 import type { TagClause } from './components/TagClauseFilter';
 
 function App() {
-  // TODO: #29 - Carregar no useEffect inicial as configurações salvas no localStorage (filtros ativos, sortBy, página atual)
-  // TODO: #29 - Adicionar um useEffect que observe mudanças nos filtros e chame localStorage.setItem('filters', JSON.stringify(...)) para persistência
-  // TODO: #29 - Garantir que o botão 'Reset' limpe as chaves salvas correspondentes no localStorage para sincronizar a sessão
+  const [initialFilters] = useState(() => {
+    try {
+      const savedFilters = localStorage.getItem('filters');
+      if (savedFilters) return JSON.parse(savedFilters);
+    } catch (e) {
+      console.error('Error parsing filters from localStorage', e);
+    }
+    return {};
+  });
+
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   // States for filters and pagination
-  const [includeAnd, setIncludeAnd] = useState('');
-  const [includeOr, setIncludeOr] = useState('');
-  const [excludeAnd, setExcludeAnd] = useState('');
-  const [excludeOr, setExcludeOr] = useState('');
+  const [includeAnd, setIncludeAnd] = useState(initialFilters.includeAnd ?? '');
+  const [includeOr, setIncludeOr] = useState(initialFilters.includeOr ?? '');
+  const [excludeAnd, setExcludeAnd] = useState(initialFilters.excludeAnd ?? '');
+  const [excludeOr, setExcludeOr] = useState(initialFilters.excludeOr ?? '');
   
   // Novos Filtros
-  const [title, setTitle] = useState('');
-  const [onlyBr, setOnlyBr] = useState(false);
-  const [reviewsMin, setReviewsMin] = useState('');
-  const [reviewsMax, setReviewsMax] = useState('');
-  const [revenueMin, setRevenueMin] = useState('');
-  const [revenueMax, setRevenueMax] = useState('');
-  const [priceMin, setPriceMin] = useState('');
-  const [priceMax, setPriceMax] = useState('');
-  const [weeksMin, setWeeksMin] = useState('');
-  const [weeksMax, setWeeksMax] = useState('');
+  const [title, setTitle] = useState(initialFilters.title ?? '');
+  const [onlyBr, setOnlyBr] = useState(initialFilters.onlyBr ?? false);
+  const [reviewsMin, setReviewsMin] = useState(initialFilters.reviewsMin ?? '');
+  const [reviewsMax, setReviewsMax] = useState(initialFilters.reviewsMax ?? '');
+  const [revenueMin, setRevenueMin] = useState(initialFilters.revenueMin ?? '');
+  const [revenueMax, setRevenueMax] = useState(initialFilters.revenueMax ?? '');
+  const [priceMin, setPriceMin] = useState(initialFilters.priceMin ?? '');
+  const [priceMax, setPriceMax] = useState(initialFilters.priceMax ?? '');
+  const [weeksMin, setWeeksMin] = useState(initialFilters.weeksMin ?? '');
+  const [weeksMax, setWeeksMax] = useState(initialFilters.weeksMax ?? '');
 
   // No Min/Max states
-  const [revNoMin, setRevNoMin] = useState(true);
-  const [revNoMax, setRevNoMax] = useState(true);
-  const [revenueNoMin, setRevenueNoMin] = useState(true);
-  const [revenueNoMax, setRevenueNoMax] = useState(true);
-  const [priceNoMin, setPriceNoMin] = useState(true);
-  const [priceNoMax, setPriceNoMax] = useState(true);
-  const [weeksNoMin, setWeeksNoMin] = useState(true);
-  const [weeksNoMax, setWeeksNoMax] = useState(true);
+  const [revNoMin, setRevNoMin] = useState(initialFilters.revNoMin ?? true);
+  const [revNoMax, setRevNoMax] = useState(initialFilters.revNoMax ?? true);
+  const [revenueNoMin, setRevenueNoMin] = useState(initialFilters.revenueNoMin ?? true);
+  const [revenueNoMax, setRevenueNoMax] = useState(initialFilters.revenueNoMax ?? true);
+  const [priceNoMin, setPriceNoMin] = useState(initialFilters.priceNoMin ?? true);
+  const [priceNoMax, setPriceNoMax] = useState(initialFilters.priceNoMax ?? true);
+  const [weeksNoMin, setWeeksNoMin] = useState(initialFilters.weeksNoMin ?? true);
+  const [weeksNoMax, setWeeksNoMax] = useState(initialFilters.weeksNoMax ?? true);
 
   // Novos estados para TagClauseFilter
-  const [tagClauses, setTagClauses] = useState<TagClause[]>([]);
+  const [tagClauses, setTagClauses] = useState<TagClause[]>(initialFilters.tagClauses ?? []);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
 
-  const [sortBy, setSortBy] = useState('revenue');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState(initialFilters.sortBy ?? 'revenue');
+  const [currentPage, setCurrentPage] = useState(initialFilters.currentPage ?? 1);
   const [totalPages, setTotalPages] = useState(1);
 
   const isInitialMount = useRef(true);
@@ -62,6 +69,26 @@ function App() {
     };
     fetchTags();
   }, []);
+
+
+
+  // Save to localStorage when states change
+  useEffect(() => {
+    const filters = {
+      includeAnd, includeOr, excludeAnd, excludeOr,
+      title, onlyBr,
+      reviewsMin, reviewsMax, revenueMin, revenueMax, priceMin, priceMax, weeksMin, weeksMax,
+      revNoMin, revNoMax, revenueNoMin, revenueNoMax, priceNoMin, priceNoMax, weeksNoMin, weeksNoMax,
+      tagClauses, sortBy, currentPage
+    };
+    localStorage.setItem('filters', JSON.stringify(filters));
+  }, [
+    includeAnd, includeOr, excludeAnd, excludeOr,
+    title, onlyBr,
+    reviewsMin, reviewsMax, revenueMin, revenueMax, priceMin, priceMax, weeksMin, weeksMax,
+    revNoMin, revNoMax, revenueNoMin, revenueNoMax, priceNoMin, priceNoMax, weeksNoMin, weeksNoMax,
+    tagClauses, sortBy, currentPage
+  ]);
 
   const fetchGames = useCallback(async (page: number) => {
     setLoading(true);
@@ -134,7 +161,7 @@ function App() {
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
-      fetchGames(1);
+      fetchGames(currentPage);
     } else {
       fetchGames(currentPage);
     }
@@ -149,14 +176,20 @@ function App() {
   };
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
+      setCurrentPage((prev: number) => prev + 1);
     }
   };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
+      setCurrentPage((prev: number) => prev - 1);
     }
+  };
+
+  const handleAppReset = () => {
+    setCurrentPage(1);
+    setSortBy('revenue');
+    localStorage.removeItem('filters');
   };
 
   return (
@@ -247,6 +280,7 @@ function App() {
         availableTags={availableTags}
         tagClauses={tagClauses}
         setTagClauses={setTagClauses}
+        onReset={handleAppReset}
       />
     </div>
   );

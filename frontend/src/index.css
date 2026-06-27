@@ -885,3 +885,37 @@ hr {
     position: static;
   }
 }
+
+/* Dropdown Search Styles - Issue #30 */
+.dropdown-search-container {
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  padding: 8px;
+  border-bottom: 1px solid var(--border-color);
+  z-index: 10;
+}
+
+.dropdown-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-input);
+  border: 1px solid #171a21;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+}
+
+.dropdown-search-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.dropdown-no-results {
+  padding: 12px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-style: italic;
+}
