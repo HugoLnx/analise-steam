@@ -79,8 +79,16 @@ function App() {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/tags/');
+      const apiBaseUrl =
+        window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:8000'
+          : (import.meta.env.VITE_API_BASE_URL ?? 'http://backend:8000');
+      const response = await axios.get(`${apiBaseUrl}/api/tags/`);
+
+
+
         setAvailableTags(response.data);
+
       } catch (err) {
         console.error('Error fetching tags:', err);
       }
@@ -151,9 +159,17 @@ function App() {
 
       const filterTags = filters.join(';');
 
-      const response = await axios.get('http://localhost:8000/api/games/', {
+      const apiBaseUrl =
+        window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:8000'
+          : (import.meta.env.VITE_API_BASE_URL ?? 'http://backend:8000');
+      const response = await axios.get(`${apiBaseUrl}/api/games/`, {
+
+
+
 
         params: {
+
           page: page,
           sort: sortBy,
           filter_tags: filterTags,
