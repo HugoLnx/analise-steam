@@ -40,6 +40,75 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+class Feature(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="features",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class MultiplayerSupport(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="multiplayer_support",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class GamepadSupport(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="gamepad_support",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class SteamDeckSupport(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="steamdeck_support",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class Language(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="languages",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
 
 class Ranking(models.Model):
 

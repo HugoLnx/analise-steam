@@ -8,7 +8,16 @@ from urllib.request import urlopen
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'steam_analytics.settings')
 django.setup()
 
-from games.models import Game, Tag, Ranking
+from games.models import (
+    Game,
+    Tag,
+    Ranking,
+    Feature,
+    MultiplayerSupport,
+    GamepadSupport,
+    SteamDeckSupport,
+    Language,
+)
 
 
 def parse_date(date_str):
