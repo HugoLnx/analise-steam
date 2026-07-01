@@ -2,9 +2,6 @@ import React, { useCallback, useEffect, useRef } from 'react';
 
 // Componente alternativo para MinMaxFilter, usando um range slider duplo para representar o intervalo, 
 // com a opção de desabilitar o min ou max para representar "sem limite".
-// TODO: #27 - Implementar validações rigorosas nos inputs manuais para que o valor mínimo digitado nunca ultrapasse o valor máximo atual menos o step
-// TODO: #27 - Corrigir o comportamento visual da barra slider__range quando os valores atingem os limites extremos (0% ou 100%)
-// TODO: #27 - Adicionar suporte nativo à tecla Tab e setas do teclado para acessibilidade nas thumbs dos sliders
 const DualRange: React.FC<{
   label: string;
   min: number;
