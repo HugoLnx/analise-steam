@@ -2,6 +2,9 @@ import React from 'react';
 import { TagClauseFilter } from './TagClauseFilter';
 import type { TagClause } from './TagClauseFilter';
 import DualRange from './DualRange';
+import { FuncTagClauseFilter } from './FuncTagClauseFilter';
+import type { FuncOptionsByCategory, FuncTagClause } from './funcTagClauseUtils';
+
 
 interface FilterSidebarProps {
   includeAnd: string;
@@ -50,6 +53,12 @@ interface FilterSidebarProps {
   availableTags: string[];
   tagClauses: TagClause[];
   setTagClauses: (clauses: TagClause[]) => void;
+
+  // TODO #31 - Funcionalidades (features/multiplayer/gamepad/steamdeck/languages)
+  funcClauses: FuncTagClause[];
+  setFuncClauses: (clauses: FuncTagClause[]) => void;
+  funcOptionsByCategory: FuncOptionsByCategory;
+
   onReset?: () => void;
 }
 
@@ -60,6 +69,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
     setExcludeAnd,
     setExcludeOr,
     onSearch,
+
     title, setTitle,
     onlyBr, setOnlyBr,
     reviewsMin, setReviewsMin,
@@ -79,6 +89,11 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
     weeksNoMin, setWeeksNoMin,
     weeksNoMax, setWeeksNoMax,
     setTagClauses,
+
+    funcClauses,
+    setFuncClauses,
+    funcOptionsByCategory,
+
     onReset,
   } = props;
   
@@ -109,6 +124,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
     setWeeksNoMin(true);
     setWeeksNoMax(true);
     setTagClauses([]);
+    setFuncClauses([]);
   };
 
   return (
@@ -129,13 +145,24 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
 
       <div className='filter-group'>
         <TagClauseFilter
-                  availableTags={props.availableTags}
-                  clauses={props.tagClauses}
-                  onChange={props.setTagClauses}
-                />
+          availableTags={props.availableTags}
+          clauses={props.tagClauses}
+          onChange={props.setTagClauses}
+        />
       </div>
 
+      {/* TODO #31 - Funcionalidades */}
+      <div className='filter-group'>
+        <FuncTagClauseFilter
+          optionsByCategory={funcOptionsByCategory}
+          clauses={funcClauses}
+          onChange={setFuncClauses}
+        />
+      </div>
+
+
       <hr />
+
 
       <div className="filter-group checkbox-group">
         <label>
@@ -216,8 +243,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         setNoMax={setWeeksNoMax}
       />
 
-      {/* TODO: #31 - Criar seção visual ou novos componentes dropdown dedicados exclusivamente para filtros de Funcionalidade (Ex: Single-player, Multi-player) */}
-      {/* TODO: #31 - Criar componente de filtro para Localização (Ex: Idiomas suportados, legendas ou dublagem em PT-BR) */}
 
       <div className="sidebar-buttons">
         <button className="btn-reset" onClick={handleReset}>

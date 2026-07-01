@@ -1,70 +1,77 @@
 import { Plus, Trash2, Check, X } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
+import type { ClauseType, FuncCategory, FuncTagClause, FuncOptionsByCategory } from './funcTagClauseUtils';
 
-export type ClauseType = 'INCLUDE_AND' | 'INCLUDE_OR' | 'EXCLUDE_AND' | 'EXCLUDE_OR';
-
-export interface TagClause {
-  id: string;
-  type: ClauseType;
-  tags: string[];
-}
-
-interface TagClauseFilterProps {
-  availableTags: string[];
-  clauses: TagClause[];
-  onChange: (clauses: TagClause[]) => void;
+interface FuncTagClauseFilterProps {
+  optionsByCategory: FuncOptionsByCategory;
+  clauses: FuncTagClause[];
+  onChange: (clauses: FuncTagClause[]) => void;
 }
 
 const clauseTypeLabels: Record<ClauseType, string> = {
   INCLUDE_AND: 'Include AND',
   INCLUDE_OR: 'Include OR',
   EXCLUDE_AND: 'Exclude AND',
-  EXCLUDE_OR: 'Exclude OR'
+  EXCLUDE_OR: 'Exclude OR',
 };
 
 const clauseTypeShortLabels: Record<ClauseType, string> = {
   INCLUDE_AND: 'AND',
   INCLUDE_OR: 'OR',
   EXCLUDE_AND: 'NOT AND',
-  EXCLUDE_OR: 'NOT OR'
+  EXCLUDE_OR: 'NOT OR',
 };
 
-export function TagClauseFilter({ availableTags, clauses, onChange }: TagClauseFilterProps) {
+const categoryLabels: Record<FuncCategory, string> = {
+  features: 'Features',
+  multiplayer: 'Multiplayer',
+  gamepad: 'Gamepad',
+  steamdeck: 'Steam Deck',
+  languages: 'Languages',
+};
+
+export function FuncTagClauseFilter({ optionsByCategory, clauses, onChange }: FuncTagClauseFilterProps) {
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const categories = useMemo(() => Object.keys(optionsByCategory) as FuncCategory[], [optionsByCategory]);
+
   const addClause = () => {
-    const newClause: TagClause = {
+    const firstCategory = categories[0] ?? 'features';
+    const newClause: FuncTagClause = {
       id: Date.now().toString(),
       type: 'INCLUDE_AND',
-      tags: []
+      category: firstCategory,
+      values: [],
     };
     onChange([...clauses, newClause]);
     setEditingId(newClause.id);
   };
 
   const removeClause = (id: string) => {
-    onChange(clauses.filter(c => c.id !== id));
+    onChange(clauses.filter((c) => c.id !== id));
     if (editingId === id) setEditingId(null);
   };
 
   const updateClauseType = (id: string, type: ClauseType) => {
-    onChange(clauses.map(c => c.id === id ? { ...c, type } : c));
+    onChange(clauses.map((c) => (c.id === id ? { ...c, type } : c)));
   };
 
-  const updateClauseTags = (id: string, tags: string[]) => {
-    onChange(clauses.map(c => c.id === id ? { ...c, tags } : c));
+  const updateClauseCategory = (id: string, category: FuncCategory) => {
+    onChange(clauses.map((c) => (c.id === id ? { ...c, category, values: [] } : c)));
+  };
+
+  const updateClauseValues = (id: string, values: string[]) => {
+    onChange(clauses.map((c) => (c.id === id ? { ...c, values } : c)));
   };
 
   return (
     <div className="filter-group tag-clause-container" ref={containerRef}>
       <div className="clause-header">
-        <label className="filter-label">Tag Clauses</label>
-        <button
-          onClick={addClause}
-          className="btn-add-clause"
-        >
+        <label className="filter-label">Function Clauses</label>
+        <button onClick={addClause} className="btn-add-clause">
           <Plus size={14} />
           Add
         </button>
@@ -89,19 +96,31 @@ export function TagClauseFilter({ availableTags, clauses, onChange }: TagClauseF
                       </option>
                     ))}
                   </select>
-                  
+
+                  <select
+                    value={clause.category}
+                    onChange={(e) => updateClauseCategory(clause.id, e.target.value as FuncCategory)}
+                    className="clause-type-select-compact"
+                    title="Categoria"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {categoryLabels[cat]}
+                      </option>
+                    ))}
+                  </select>
+
                   <MultiSelectDropdown
-                    label="Tags"
-                    options={availableTags}
-                    selectedValues={clause.tags}
-                    onChange={(tags) => updateClauseTags(clause.id, tags)}
-                    placeholder="Tags..."
+                    label={categoryLabels[clause.category]}
+                    options={optionsByCategory[clause.category]}
+                    selectedValues={clause.values}
+                    onChange={(values) => updateClauseValues(clause.id, values)}
+                    placeholder="Select..."
                     hideLabel
                   />
-                  
 
                   <div className="clause-edit-actions">
-                    <button 
+                    <button
                       onClick={() => setEditingId(null)}
                       className="btn-done-clause"
                       title="Done"
@@ -121,17 +140,19 @@ export function TagClauseFilter({ availableTags, clauses, onChange }: TagClauseF
             );
           }
 
+          const preview = clause.values.length > 0 ? clause.values.join(', ') : 'Empty';
+
           return (
-            <div 
-              key={clause.id} 
+            <div
+              key={clause.id}
               className={`clause-summary-chip ${clause.type.startsWith('EXCLUDE') ? 'exclude' : ''}`}
               onClick={() => setEditingId(clause.id)}
             >
               <span className="clause-type-badge">{clauseTypeShortLabels[clause.type]}</span>
               <span className="clause-tags-preview">
-                {clause.tags.length > 0 ? clause.tags.join(', ') : 'Empty'}
+                {categoryLabels[clause.category]}: {preview}
               </span>
-              <button 
+              <button
                 className="clause-chip-remove"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -144,12 +165,12 @@ export function TagClauseFilter({ availableTags, clauses, onChange }: TagClauseF
           );
         })}
 
-        {clauses.length === 0 && (
-          <div className="empty-clauses-mini">
-            No clauses.
-          </div>
-        )}
+        {clauses.length === 0 && <div className="empty-clauses-mini">No clauses.</div>}
       </div>
+
+
     </div>
   );
 }
+
+

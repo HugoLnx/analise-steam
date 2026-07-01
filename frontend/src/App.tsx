@@ -3,6 +3,11 @@ import axios from 'axios';
 import GameCard, { type Game } from './components/GameCard';
 import FilterSidebar from './components/FilterSidebar';
 import type { TagClause } from './components/TagClauseFilter';
+import type { FuncOptionsByCategory, FuncTagClause } from './components/funcTagClauseUtils';
+
+import { fetchOptionsByCategory } from './components/FuncOptionsProvider';
+
+
 
 function App() {
   const [initialFilters] = useState(() => {
@@ -51,6 +56,19 @@ function App() {
   const [tagClauses, setTagClauses] = useState<TagClause[]>(initialFilters.tagClauses ?? []);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
 
+  // TODO #31 - Funcionalidades
+  const [funcClauses, setFuncClauses] = useState<FuncTagClause[]>(initialFilters.funcClauses ?? []);
+  const [funcOptionsByCategory, setFuncOptionsByCategory] = useState<FuncOptionsByCategory>({
+    features: [],
+    multiplayer: [],
+    gamepad: [],
+    steamdeck: [],
+    languages: [],
+  });
+
+
+
+
   const [sortBy, setSortBy] = useState(initialFilters.sortBy ?? 'revenue');
   const [currentPage, setCurrentPage] = useState(initialFilters.currentPage ?? 1);
   const [totalPages, setTotalPages] = useState(1);
@@ -70,6 +88,16 @@ function App() {
     fetchTags();
   }, []);
 
+  // Fetch functional options (features/multiplayer/etc)
+  useEffect(() => {
+    const run = async () => {
+      const opts = await fetchOptionsByCategory();
+      setFuncOptionsByCategory(opts);
+    };
+    run();
+  }, []);
+
+
 
 
   // Save to localStorage when states change
@@ -79,7 +107,7 @@ function App() {
       title, onlyBr,
       reviewsMin, reviewsMax, revenueMin, revenueMax, priceMin, priceMax, weeksMin, weeksMax,
       revNoMin, revNoMax, revenueNoMin, revenueNoMax, priceNoMin, priceNoMax, weeksNoMin, weeksNoMax,
-      tagClauses, sortBy, currentPage
+      tagClauses, funcClauses, sortBy, currentPage
     };
     localStorage.setItem('filters', JSON.stringify(filters));
   }, [
@@ -87,7 +115,7 @@ function App() {
     title, onlyBr,
     reviewsMin, reviewsMax, revenueMin, revenueMax, priceMin, priceMax, weeksMin, weeksMax,
     revNoMin, revNoMax, revenueNoMin, revenueNoMax, priceNoMin, priceNoMax, weeksNoMin, weeksNoMax,
-    tagClauses, sortBy, currentPage
+    tagClauses, funcClauses, sortBy, currentPage
   ]);
 
   const fetchGames = useCallback(async (page: number) => {
@@ -110,13 +138,27 @@ function App() {
         }
       });
 
+      // TODO #31 - Funcionalidades: usa o mesmo formato de filter_tags,
+      // mas serializa valores como "categoria:valor".
+      funcClauses.forEach((clause) => {
+        if (clause.values?.length) {
+          filters.push(
+            `${clause.type} ${clause.values.map((v) => `${clause.category}:${v}`).join(',')}`
+          );
+        }
+      });
+
+
       const filterTags = filters.join(';');
 
       const response = await axios.get('http://localhost:8000/api/games/', {
+
         params: {
           page: page,
           sort: sortBy,
           filter_tags: filterTags,
+
+
           title: title,
           only_br: onlyBr,
           reviews_min: revNoMin ? '' : reviewsMin,
@@ -143,19 +185,7 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [
-    includeAnd, includeOr, excludeAnd, excludeOr, 
-    sortBy, title, onlyBr, 
-    reviewsMin, reviewsMax, 
-    revenueMin, revenueMax, 
-    priceMin, priceMax, 
-    weeksMin, weeksMax,
-    revNoMin, revNoMax,
-    revenueNoMin, revenueNoMax,
-    priceNoMin, priceNoMax,
-    weeksNoMin, weeksNoMax,
-    tagClauses
-  ]);
+  }, [includeAnd, includeOr, excludeAnd, excludeOr, tagClauses, funcClauses, sortBy, title, onlyBr, revNoMin, reviewsMin, revNoMax, reviewsMax, revenueNoMin, revenueMin, revenueNoMax, revenueMax, priceNoMin, priceMin, priceNoMax, priceMax, weeksNoMin, weeksMin, weeksNoMax, weeksMax]);
 
   // Handle page changes
   useEffect(() => {
@@ -234,6 +264,10 @@ function App() {
       <FilterSidebar 
         includeAnd={includeAnd}
         setIncludeAnd={setIncludeAnd}
+        funcClauses={funcClauses}
+        setFuncClauses={setFuncClauses}
+        funcOptionsByCategory={funcOptionsByCategory}
+
         includeOr={includeOr}
         setIncludeOr={setIncludeOr}
         excludeAnd={excludeAnd}

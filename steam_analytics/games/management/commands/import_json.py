@@ -18,6 +18,21 @@ def parse_date(date_str):
         return None
 
 
+def as_list(value):
+    """Garante que o valor do JSON vire lista.
+
+    - Se for None -> []
+    - Se já for list -> mantém
+    - Caso contrário -> envolve em lista (mantém o valor mesmo que venha string/objeto)
+    """
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return value
+    return [value]
+
+
+
 def load_json(source):
     # Se for link
     if source.startswith("http"):
@@ -50,8 +65,45 @@ def import_json(source):
                 "capsule_url": raw.get("capsule_url"),
                 "review_count_1year": raw.get("review_count_1year"),
                 "review_impression": raw.get("review_impression"),
-                # TODO: #22 - Localizar e extrair a chave de array/objeto correspondente às funcionalidades do jogo dentro do JSON (ex: raw.get("features", []))
-                # TODO: #22 - Inserir de forma sanitizada os metadados no novo campo ou tabela mapeada no modelo Game
+                # TODO: #22 - Importar metadados de funcionalidades do JSON (ex: flags.multiplayer_support, etc.)
+                # Compatibilidade com formatos diferentes de input:
+                # - Formato A (atual): game.raw_data.flags.*
+                # - Formato B (possível em fontes antigas): game.flags.*
+                "features": as_list(
+                    (raw.get("flags")
+                     or game.get("flags")
+                     or raw.get("raw_data", {}).get("flags")
+                     or {}).get("features")
+                ),
+                "multiplayer_support": as_list(
+                    (raw.get("flags")
+                     or game.get("flags")
+                     or raw.get("raw_data", {}).get("flags")
+                     or {}).get("multiplayer_support")
+                ),
+                "gamepad_support": as_list(
+                    (raw.get("flags")
+                     or game.get("flags")
+                     or raw.get("raw_data", {}).get("flags")
+                     or {}).get("gamepad_support")
+                ),
+                "steamdeck_support": as_list(
+                    (raw.get("flags")
+                     or game.get("flags")
+                     or raw.get("raw_data", {}).get("flags")
+                     or {}).get("steamdeck_support")
+                ),
+                "languages": as_list(
+                    (raw.get("flags")
+                     or game.get("flags")
+                     or raw.get("raw_data", {}).get("flags")
+                     or {}).get("languages")
+                ),
+
+
+
+
+
             }
         )
 
