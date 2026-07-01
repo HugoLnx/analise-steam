@@ -26,6 +26,8 @@ Este projeto tem como objetivo importar dados de jogos extraídos da Steam (via 
 * Python
 * Django
 * SQLite (banco de dados padrão)
+* React
+* Docker
 
 ---
 
@@ -195,6 +197,20 @@ Frontend React rodando em http://localhost:5173
 
 
 ```
+
+## 🚀 Como rodar o projeto (Docker)
+
+### 1. Rodar com Docker (Docker Compose)
+
+#### Passos
+
+```bash
+docker compose up --build
+```
+
+- Frontend: http://localhost:5173
+- Backend (admin): http://localhost:8000/admin
+
 
 ---
 
