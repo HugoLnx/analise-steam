@@ -35,11 +35,11 @@ const DualRange: React.FC<{
   // Sincroniza a largura da barra visual (track) com os valores atuais.
   useEffect(() => {
     if (rangeRef.current) {
-      const minPercent = noMin ? 0 : getPercent(numericMin);
-      const maxPercent = noMax ? 100 : getPercent(numericMax);
+      const minPercent = noMin ? 0 : Math.max(0, Math.min(100, getPercent(numericMin)));
+      const maxPercent = noMax ? 100 : Math.max(0, Math.min(100, getPercent(numericMax)));
 
       rangeRef.current.style.left = `${minPercent}%`;
-      rangeRef.current.style.width = `${maxPercent - minPercent}%`;
+      rangeRef.current.style.width = `${Math.max(0, maxPercent - minPercent)}%`;
     }
   }, [numericMin, numericMax, getPercent, noMin, noMax]);
 
@@ -69,11 +69,7 @@ const DualRange: React.FC<{
             step={step}
             disabled={noMin}
             onChange={(e) => {
-              const val = Number(e.target.value);
-              if (!isNaN(val)) {
-                const safeVal = Math.min(Math.max(val, min), numericMax - step);
-                setMin(safeVal.toString());
-              }
+              setMin(e.target.value);
             }}
             placeholder="Min"
           />
@@ -88,11 +84,7 @@ const DualRange: React.FC<{
             step={step}
             disabled={noMax}
             onChange={(e) => {
-              const val = Number(e.target.value);
-              if (!isNaN(val)) {
-                const safeVal = Math.max(Math.min(val, max), numericMin + step);
-                setMax(safeVal.toString());
-              }
+              setMax(e.target.value);
             }}
             placeholder="Max"
           />

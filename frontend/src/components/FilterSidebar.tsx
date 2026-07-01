@@ -93,13 +93,13 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
     setTitle('');
     setOnlyBr(false);
     setReviewsMin('0');
-    setReviewsMax('10000');
+    setReviewsMax('800');
     setRevenueMin('0');
     setRevenueMax('10000');
     setPriceMin('0');
-    setPriceMax('200');
+    setPriceMax('80');
     setWeeksMin('0');
-    setWeeksMax('520');
+    setWeeksMax('260');
     setRevNoMin(true);
     setRevNoMax(true);
     setRevenueNoMin(true);
@@ -154,7 +154,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
       <DualRange
         label="Reviews 1 Year"
         min={0}
-        max={1000000}
+        max={800}
+        step={10}
         minVal={reviewsMin}
         maxVal={reviewsMax}
         setMin={setReviewsMin}
@@ -169,7 +170,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
       <DualRange
         label="Revenue 1 Year"
         min={0}
-        max={1000000000}
+        max={10000}
+        step={100}
         minVal={revenueMin}
         maxVal={revenueMax}
         setMin={setRevenueMin}
@@ -185,8 +187,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
       <DualRange
         label="Price"
         min={0}
-        max={500}
-        step={0.01}
+        max={80}
+        step={1}
         minVal={priceMin}
         maxVal={priceMax}
         setMin={setPriceMin}
@@ -202,7 +204,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
       <DualRange
         label="Release Date"
         min={0}
-        max={520}
+        max={260}
+        step={4}
         minVal={weeksMin}
         maxVal={weeksMax}
         setMin={setWeeksMin}
