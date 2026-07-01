@@ -16,12 +16,21 @@ class Game(models.Model):
     revenue_1year = models.FloatField(null=True)
 
     # Novos campos
-    # TODO: #22 - Criar um models.JSONField(default=list, null=True) ou uma tabela/relação ManyToMany dedicada para registrar as Funcionalidades de cada jogo (ex: Single-player, Multi-player, Co-op)
-    # TODO: #22 - Rodar os comandos 'python manage.py makemigrations' e 'python manage.py migrate' após a inclusão do novo campo para atualizar a tabela local
+    features = models.JSONField(default=list, null=True)
+
+    multiplayer_support = models.JSONField(default=list, null=True)
+    gamepad_support = models.JSONField(default=list, null=True)
+    steamdeck_support = models.JSONField(default=list, null=True)
+    languages = models.JSONField(default=list, null=True)
     screenshot_urls = models.JSONField(default=list, null=True)
+
+
     capsule_url = models.URLField(max_length=500, null=True)
     review_count_1year = models.FloatField(null=True)
     review_impression = models.CharField(max_length=100, null=True)
+
+    # 🇧🇷 FLAG BR (NOVO)
+    is_br = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -32,6 +41,75 @@ class Tag(models.Model):
     game = models.ForeignKey(
         Game,
         related_name="tags",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Feature(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="features_rel",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class MultiplayerSupport(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="multiplayer_support_rel",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class GamepadSupport(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="gamepad_support_rel",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class SteamDeckSupport(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="steamdeck_support_rel",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class Language(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="languages_rel",
         on_delete=models.CASCADE
     )
 
