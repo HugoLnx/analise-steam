@@ -96,6 +96,18 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
 
     onReset,
   } = props;
+
+  const formatWeeks = (weeks: string) => {
+    const w = Number(weeks);
+    if (isNaN(w) || w === 0) return '0w';
+    if (w < 4) return `${w}w`;
+    if (w < 52) {
+      const m = Math.floor(w / 4);
+      return `${m}mo`;
+    }
+    const y = (w / 52).toFixed(1).replace(/\.0$/, '');
+    return `${y}y`;
+  };
   
   const handleReset = () => {
     if (onReset) {
@@ -108,13 +120,13 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
     setTitle('');
     setOnlyBr(false);
     setReviewsMin('0');
-    setReviewsMax('10000');
+    setReviewsMax('800');
     setRevenueMin('0');
     setRevenueMax('10000');
     setPriceMin('0');
-    setPriceMax('200');
+    setPriceMax('80');
     setWeeksMin('0');
-    setWeeksMax('520');
+    setWeeksMax('260');
     setRevNoMin(true);
     setRevNoMax(true);
     setRevenueNoMin(true);
@@ -176,12 +188,11 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
       </div>
 
       <hr />
-      {/* TODO: #27 - Configurar min/max reais e step para Reviews de 1 Ano (Ex: min: 0, max: 1000000, step: 1000) */}
-      {/* TODO: #27 - Garantir que a alteração manual nos inputs de texto reflita perfeitamente nos sliders sem lag */}
       <DualRange
         label="Reviews 1 Year"
         min={0}
-        max={1000000}
+        max={800}
+        step={10}
         minVal={reviewsMin}
         maxVal={reviewsMax}
         setMin={setReviewsMin}
@@ -191,12 +202,11 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         noMax={revNoMax}
         setNoMax={setRevNoMax}
       />
-      {/* TODO: #27 - Configurar min/max reais e step para Receita de 1 Ano (Ex: min: 0, max: 1000000000, step: 50000) */}
-      {/* TODO: #27 - Validar formatação do prefixo e garantir que valores grandes não quebrem o layout do input */}
       <DualRange
         label="Revenue 1 Year"
         min={0}
-        max={1000000000}
+        max={10000}
+        step={100}
         minVal={revenueMin}
         maxVal={revenueMax}
         setMin={setRevenueMin}
@@ -207,13 +217,11 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         setNoMax={setRevenueNoMax}
         prefix="$"
       />
-      {/* TODO: #27 - Configurar min/max reais e step para Preço (Ex: min: 0, max: 500, step: 0.01 ou 0.99 para centavos) */}
-      {/* TODO: #27 - Corrigir o arredondamento de casas decimais (toFixed(2)) ao arrastar a thumb de preço */}
       <DualRange
         label="Price"
         min={0}
-        max={500}
-        step={0.01}
+        max={80}
+        step={1}
         minVal={priceMin}
         maxVal={priceMax}
         setMin={setPriceMin}
@@ -224,12 +232,11 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         setNoMax={setPriceNoMax}
         prefix="$"
       />
-      {/* TODO: #27 - Configurar min/max reais e step para Release Date em semanas (Ex: min: 0, max: 520, step: 1) */}
-      {/* TODO: #27 - Adicionar uma legenda ou tooltip convertendo o número de semanas para anos/meses dinamicamente */}
       <DualRange
-        label="Release Date"
+        label={`Release Date: ${weeksNoMin ? 'now' : formatWeeks(weeksMin)} ~ ${weeksNoMax ? '∞' : formatWeeks(weeksMax)} ago`}
         min={0}
-        max={520}
+        max={260}
+        step={4}
         minVal={weeksMin}
         maxVal={weeksMax}
         setMin={setWeeksMin}
