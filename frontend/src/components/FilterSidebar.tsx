@@ -54,7 +54,6 @@ interface FilterSidebarProps {
   tagClauses: TagClause[];
   setTagClauses: (clauses: TagClause[]) => void;
 
-  // TODO #31 - Funcionalidades (features/multiplayer/gamepad/steamdeck/languages)
   funcClauses: FuncTagClause[];
   setFuncClauses: (clauses: FuncTagClause[]) => void;
   funcOptionsByCategory: FuncOptionsByCategory;
@@ -163,7 +162,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         />
       </div>
 
-      {/* TODO #31 - Funcionalidades */}
       <div className='filter-group'>
         <FuncTagClauseFilter
           optionsByCategory={funcOptionsByCategory}

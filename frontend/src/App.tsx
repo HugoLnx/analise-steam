@@ -56,7 +56,6 @@ function App() {
   const [tagClauses, setTagClauses] = useState<TagClause[]>(initialFilters.tagClauses ?? []);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
 
-  // TODO #31 - Funcionalidades
   const [funcClauses, setFuncClauses] = useState<FuncTagClause[]>(initialFilters.funcClauses ?? []);
   const [funcOptionsByCategory, setFuncOptionsByCategory] = useState<FuncOptionsByCategory>({
     features: [],
@@ -146,8 +145,6 @@ function App() {
         }
       });
 
-      // TODO #31 - Funcionalidades: usa o mesmo formato de filter_tags,
-      // mas serializa valores como "categoria:valor".
       funcClauses.forEach((clause) => {
         if (clause.values?.length) {
           filters.push(

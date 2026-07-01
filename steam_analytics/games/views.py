@@ -34,7 +34,6 @@ def list_games(request):
     # ==========================================
     # NOVOS FILTROS
     # ==========================================
-    # TODO: #32 - Estendido via `filter_tags` com prefixos de categoria.
     # Exemplo de tag:
     #   features:Co-op
     #   multiplayer:Single-player

@@ -16,7 +16,6 @@ class Game(models.Model):
     revenue_1year = models.FloatField(null=True)
 
     # Novos campos
-    # TODO: #22 - Rodar os comandos 'python manage.py makemigrations' e 'python manage.py migrate' após a inclusão do novo campo para atualizar a tabela local
     features = models.JSONField(default=list, null=True)
 
     multiplayer_support = models.JSONField(default=list, null=True)

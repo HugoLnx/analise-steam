@@ -75,7 +75,6 @@ def import_json(source):
                 "capsule_url": raw.get("capsule_url"),
                 "review_count_1year": raw.get("review_count_1year"),
                 "review_impression": raw.get("review_impression"),
-                # TODO: #22 - Importar metadados de funcionalidades do JSON (ex: flags.multiplayer_support, etc.)
                 # Compatibilidade com formatos diferentes de input:
                 # - Formato A (atual): game.raw_data.flags.*
                 # - Formato B (possível em fontes antigas): game.flags.*

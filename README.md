@@ -5,16 +5,6 @@
 > * Expandir a seção de Descrição incluindo os objetivos do projeto e o Modelo Conceitual BFD (Basic Functional Design).
 > * Adicionar seção detalhada de Autoria e Responsabilidade mapeando as contribuições de cada participante do grupo.
 
-> **⚠️ TODO: #21 - Setup Docker & Docker-Compose**
->
-> * Criar `Dockerfile` na raiz para o Backend Django (utilizar Python 3.x-slim e expor porta 8000).
-> * Criar `Dockerfile` dentro da pasta `frontend/` para o React (utilizar Node.js para build e opcionalmente Nginx para servir os estáticos ou apenas node para dev).
-> * Criar `docker-compose.yml` na raiz orquestrando dois serviços independentes:
->    * `backend`: Deve montar volume para o `db.sqlite3` para persistência e rodar as migrations no startup.
->    * `frontend`: Deve se comunicar com o backend via URL de API configurável (variável de ambiente).
->
-> * Garantir que a `CORS_ALLOWED_ORIGINS` no Django aceite a origem do container frontend.
-
 ## 📌 Descrição
 
 Este projeto tem como objetivo importar dados de jogos extraídos da Steam (via bot) a partir de um arquivo JSON e armazená-los em um banco de dados, permitindo visualização e análise através do Django Admin.
@@ -210,7 +200,6 @@ docker compose up --build
 
 - Frontend: http://localhost:5173
 - Backend (admin): http://localhost:8000/admin
-
 
 ---
 
