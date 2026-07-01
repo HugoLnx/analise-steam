@@ -5,7 +5,7 @@ import sys
 from datetime import datetime
 from urllib.request import urlopen
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'steam_analytics.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "steam_analytics.settings")
 django.setup()
 
 from games.models import (
@@ -34,7 +34,7 @@ def load_json(source):
             return json.loads(response.read().decode())
     else:
         # Se for arquivo local
-        with open(source, 'r', encoding='utf-8') as f:
+        with open(source, "r", encoding="utf-8") as f:
             return json.load(f)
 
 
@@ -42,6 +42,7 @@ def import_json(source):
     data = load_json(source)
 
     for game in data.get("games", []):
+
         raw = game.get("raw_data", {})
 
         if not raw.get("appid"):
@@ -59,30 +60,100 @@ def import_json(source):
                 "capsule_url": raw.get("capsule_url"),
                 "review_count_1year": raw.get("review_count_1year"),
                 "review_impression": raw.get("review_impression"),
-                # TODO: #22 - Localizar e extrair a chave de array/objeto correspondente às funcionalidades do jogo dentro do JSON (ex: raw.get("features", []))
-                # TODO: #22 - Inserir de forma sanitizada os metadados no novo campo ou tabela mapeada no modelo Game
-            }
+            },
         )
 
-        # tags
+        # ==========================
+        # TAGS
+        # ==========================
+
         Tag.objects.filter(game=game_obj).delete()
+
         for tag in raw.get("raw_main_tags", []):
-            Tag.objects.create(game=game_obj, name=tag)
+            Tag.objects.create(
+                game=game_obj,
+                name=tag
+            )
 
-        # TODO: #18 - Criar lógica ou comando adicional para baixar/ler as linhas de IDs do arquivo txt externo (https://github.com/user-attachments/files/29065218/all-br-games.txt)
-        # TODO: #18 - Verificar se o `game_obj.appid` atual está contido nessa lista e automaticamente criar/garantir a Tag(name="brazilian") ou campo específico correspondente
+        # ==========================
+        # FEATURES
+        # ==========================
 
-        # rankings
+        flags = raw.get("flags", {})
+
+        Feature.objects.filter(game=game_obj).delete()
+
+        for feature in flags.get("features", []):
+            Feature.objects.create(
+                game=game_obj,
+                name=feature
+            )
+
+        # ==========================
+        # MULTIPLAYER
+        # ==========================
+
+        MultiplayerSupport.objects.filter(game=game_obj).delete()
+
+        for value in flags.get("multiplayer_support", []):
+            MultiplayerSupport.objects.create(
+                game=game_obj,
+                name=value
+            )
+
+        # ==========================
+        # GAMEPAD
+        # ==========================
+
+        GamepadSupport.objects.filter(game=game_obj).delete()
+
+        for value in flags.get("gamepad_support", []):
+            GamepadSupport.objects.create(
+                game=game_obj,
+                name=value
+            )
+
+        # ==========================
+        # STEAM DECK
+        # ==========================
+
+        SteamDeckSupport.objects.filter(game=game_obj).delete()
+
+        for value in flags.get("steamdeck_support", []):
+            SteamDeckSupport.objects.create(
+                game=game_obj,
+                name=value
+            )
+
+        # ==========================
+        # LANGUAGES
+        # ==========================
+
+        Language.objects.filter(game=game_obj).delete()
+
+        for value in flags.get("languages", []):
+            Language.objects.create(
+                game=game_obj,
+                name=value
+            )
+
+        # ==========================
+        # RANKINGS
+        # ==========================
+
         Ranking.objects.filter(game=game_obj).delete()
+
         rankings = game.get("rankings", {})
 
         for r_type, values in rankings.items():
+
             for tag, position in values.items():
+
                 Ranking.objects.create(
                     game=game_obj,
                     tag=tag,
                     type=r_type,
-                    position=position
+                    position=position,
                 )
 
     print("Importação finalizada!")
