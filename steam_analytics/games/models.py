@@ -30,6 +30,9 @@ class Game(models.Model):
     review_count_1year = models.FloatField(null=True)
     review_impression = models.CharField(max_length=100, null=True)
 
+    # 🇧🇷 FLAG BR (NOVO)
+    is_br = models.BooleanField(default=False)
+
     def __str__(self):
         return self.name
 
@@ -39,6 +42,75 @@ class Tag(models.Model):
     game = models.ForeignKey(
         Game,
         related_name="tags",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Feature(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="features_rel",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class MultiplayerSupport(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="multiplayer_support_rel",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class GamepadSupport(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="gamepad_support_rel",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class SteamDeckSupport(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="steamdeck_support_rel",
+        on_delete=models.CASCADE
+    )
+
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class Language(models.Model):
+
+    game = models.ForeignKey(
+        Game,
+        related_name="languages_rel",
         on_delete=models.CASCADE
     )
 
